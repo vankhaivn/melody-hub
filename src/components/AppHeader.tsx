@@ -35,7 +35,7 @@ export default function AppHeader() {
                     "data-[active=true]:after:right-0",
                     "data-[active=true]:after:h-[2px]",
                     "data-[active=true]:after:rounded-[2px]",
-                    "data-[active=true]:after:bg-primary",
+                    "data-[active=true]:after:bg-success-500",
                 ],
             }}
         >
@@ -56,7 +56,9 @@ export default function AppHeader() {
             </NavbarContent>
             <NavbarContent className="hidden sm:flex" justify="start">
                 <NavbarItem isActive>
-                    <Link href="#">Trending</Link>
+                    <Link href="#" color="success">
+                        Trending
+                    </Link>
                 </NavbarItem>
                 <NavbarItem>
                     <Link href="#" color="foreground">
