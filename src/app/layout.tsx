@@ -22,13 +22,15 @@ export default function RootLayout({
         <html lang="en">
             <body className={inter.className}>
                 <Providers>
-                    <div className="flex">
-                        <div className="w-1/5">
-                            <AppSidebar />
-                        </div>
-                        <div className="w-4/5">
-                            <AppHeader />
-                            {children}
+                    <div className="flex min-h-screen flex-col">
+                        <div className="flex flex-1">
+                            <div className="w-1/6">
+                                <AppSidebar />
+                            </div>
+                            <div className="w-5/6 pb-16">
+                                <AppHeader />
+                                {children}
+                            </div>
                         </div>
                     </div>
                     <ToastContainer

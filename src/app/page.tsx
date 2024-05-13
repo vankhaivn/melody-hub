@@ -8,10 +8,17 @@ import {
     Divider,
 } from "@nextui-org/react"
 import { AcmeLogo } from "@/components/icons/AcmeLogo"
-import MusicPlayer from "@/components/MusicPlayer"
 import { toast } from "react-toastify"
+import { useMusicPlayer } from "@/components/MusicPlayer/MusicPlayerContext"
+import { get_all_artists } from "@/api/artists"
 
 export default function Home() {
+    const { showPlayer, hidePlayer } = useMusicPlayer()
+    const fetchArtists = async () => {
+        const artists = await get_all_artists()
+        console.log(artists)
+        toast.success("Artists fetched successfully!")
+    }
     return (
         <div className="p-4">
             <Card
@@ -51,7 +58,7 @@ export default function Home() {
                     </Button>
                 </CardFooter>
             </Card>
-            <div className="w-100 mt-8">
+            <div className="w-100 my-12">
                 <div className="space-y-1">
                     <h1 className="text-2xl font-bold">Trending Songs</h1>
                     <p className="text-large text-default-400">
@@ -141,9 +148,17 @@ export default function Home() {
                         src="https://nextui.org/images/card-example-3.jpeg"
                     />
                 </Card>
-            </div>
-            <div className="py-10 flex justify-center">
-                <MusicPlayer />
+                <Button
+                    onClick={() =>
+                        showPlayer(
+                            "https://firebasestorage.googleapis.com/v0/b/melodyhub-e6e1a.appspot.com/o/tracks%2F3D%20(feat.%20Jack%20Harlow).mp3?alt=media&token=13e67895-d8f1-48f4-b868-40e3499df064"
+                        )
+                    }
+                >
+                    Play!
+                </Button>
+                <Button onClick={() => hidePlayer()}>Stop Music</Button>
+                <Button onClick={fetchArtists}>Fetch Artists</Button>
             </div>
         </div>
     )
