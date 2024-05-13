@@ -1,4 +1,4 @@
-import React from "react"
+"use client"
 import {
     Card,
     CardHeader,
@@ -7,6 +7,10 @@ import {
     Button,
     Divider,
 } from "@nextui-org/react"
+import { AcmeLogo } from "@/components/icons/AcmeLogo"
+import MusicPlayer from "@/components/MusicPlayer"
+import { toast } from "react-toastify"
+
 export default function Home() {
     return (
         <div className="p-4">
@@ -18,29 +22,27 @@ export default function Home() {
                     <p className="text-tiny text-white/60 uppercase font-bold">
                         Your day your way
                     </p>
-                    <h4 className="text-white/90 font-medium text-xl">
-                        Your checklist for better sleep
+                    <h4 className="text-white/90 font-bold text-2xl">
+                        Your music for a better day
                     </h4>
                 </CardHeader>
                 <Image
                     removeWrapper
                     alt="Relaxing app background"
-                    className="z-0 w-full h-full object-cover"
+                    className="z-0 w-full h-full object-cover cursor-pointer hover:scale-110 duration-700"
                     src="/bg.jpg"
                 />
                 <CardFooter className="absolute bg-black/40 bottom-0 z-10 border-t-1 border-default-600 dark:border-default-100">
                     <div className="flex flex-grow gap-2 items-center">
-                        <Image
-                            alt="Breathing app icon"
-                            className="rounded-full w-10 h-11 bg-black"
-                            src="https://nextui.org/images/breathing-app-icon.jpeg"
-                        />
+                        <div className="h-10 w-10 bg-black rounded-md flex justify-center items-center">
+                            <AcmeLogo size={36} />
+                        </div>
                         <div className="flex flex-col">
                             <p className="text-tiny text-white/60">
-                                Breathing App
+                                Melody Hub App
                             </p>
                             <p className="text-tiny text-white/60">
-                                Get a good night's sleep.
+                                Available on App Store
                             </p>
                         </div>
                     </div>
@@ -58,7 +60,7 @@ export default function Home() {
                 </div>
                 <Divider className="my-4" />
             </div>
-            <div className="gap-6 grid grid-cols-12">
+            <div className="gap-6 grid grid-cols-12 grid-rows-2">
                 <Card className="col-span-12 sm:col-span-4 h-[300px]">
                     <CardHeader className="absolute z-10 top-1 flex-col !items-start">
                         <p className="text-tiny text-white/60 uppercase font-bold">
@@ -71,7 +73,7 @@ export default function Home() {
                     <Image
                         removeWrapper
                         alt="Card background"
-                        className="z-0 w-full h-full object-cover"
+                        className="z-0 w-full h-full object-cover hover:scale-125 duration-700 cursor-pointer"
                         src="https://nextui.org/images/card-example-4.jpeg"
                     />
                 </Card>
@@ -87,7 +89,7 @@ export default function Home() {
                     <Image
                         removeWrapper
                         alt="Card background"
-                        className="z-0 w-full h-full object-cover"
+                        className="z-0 w-full h-full object-cover hover:scale-125 duration-700 cursor-pointer"
                         src="https://nextui.org/images/card-example-3.jpeg"
                     />
                 </Card>
@@ -103,10 +105,45 @@ export default function Home() {
                     <Image
                         removeWrapper
                         alt="Card background"
-                        className="z-0 w-full h-full object-cover"
+                        className="z-0 w-full h-full object-cover hover:scale-125 duration-700 cursor-pointer"
                         src="https://nextui.org/images/card-example-2.jpeg"
                     />
                 </Card>
+                <Card className="col-span-12 sm:col-span-7 h-[300px]">
+                    <CardHeader className="absolute z-10 top-1 flex-col !items-start">
+                        <p className="text-tiny text-white/60 uppercase font-bold">
+                            Supercharged
+                        </p>
+                        <h4 className="text-white font-medium text-large">
+                            Creates beauty like a beast
+                        </h4>
+                    </CardHeader>
+                    <Image
+                        removeWrapper
+                        alt="Card background"
+                        className="z-0 w-full h-full object-cover hover:scale-125 duration-700 cursor-pointer"
+                        src="https://nextui.org/images/card-example-2.jpeg"
+                    />
+                </Card>
+                <Card className="col-span-12 sm:col-span-5 h-[300px]">
+                    <CardHeader className="absolute z-10 top-1 flex-col !items-start">
+                        <p className="text-tiny text-white/60 uppercase font-bold">
+                            Supercharged
+                        </p>
+                        <h4 className="text-white font-medium text-large">
+                            Creates beauty like a beast
+                        </h4>
+                    </CardHeader>
+                    <Image
+                        removeWrapper
+                        alt="Card background"
+                        className="z-0 w-full h-full object-cover hover:scale-125 duration-700 cursor-pointer"
+                        src="https://nextui.org/images/card-example-3.jpeg"
+                    />
+                </Card>
+            </div>
+            <div className="py-10 flex justify-center">
+                <MusicPlayer />
             </div>
         </div>
     )
