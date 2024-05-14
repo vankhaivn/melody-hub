@@ -24,3 +24,15 @@ export const get_top_trending_tracks = async (limit: number) => {
         return []
     }
 }
+
+export const get_tracks_by_artist_id = async (artistId: string) => {
+    try {
+        const url = `${baseUrl}/track/get-tracks-by-artist-id?artist_id=${artistId}`
+        const response = await axios.get(url)
+        const tracks: ITrack[] = response.data
+        return tracks
+    } catch (error) {
+        console.error("Error fetching artists:", error)
+        return []
+    }
+}
