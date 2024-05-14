@@ -148,17 +148,6 @@ export default function Home() {
                         src="https://nextui.org/images/card-example-3.jpeg"
                     />
                 </Card>
-                <Button
-                    onClick={() =>
-                        showPlayer(
-                            "https://firebasestorage.googleapis.com/v0/b/melodyhub-e6e1a.appspot.com/o/tracks%2F3D%20(feat.%20Jack%20Harlow).mp3?alt=media&token=13e67895-d8f1-48f4-b868-40e3499df064"
-                        )
-                    }
-                >
-                    Play!
-                </Button>
-                <Button onClick={() => hidePlayer()}>Stop Music</Button>
-                <Button onClick={fetchArtists}>Fetch Artists</Button>
             </div>
         </div>
     )

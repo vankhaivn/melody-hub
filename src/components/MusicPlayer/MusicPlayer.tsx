@@ -11,13 +11,23 @@ import { VolumeHighIcon } from "../icons/VolumeHighIcon"
 import { VolumeLowIcon } from "../icons/VolumeLowIcon"
 import { useMusicPlayer } from "@/components/MusicPlayer/MusicPlayerContext"
 
-export default function MusicPlayer({ audioUrl }: { audioUrl: string }) {
+export default function MusicPlayer({
+    trackUrl,
+    trackName,
+    imageUrl,
+    artistName,
+}: {
+    trackUrl: string
+    trackName: string
+    imageUrl: string
+    artistName: string
+}) {
     const { hidePlayer, isVisible } = useMusicPlayer()
     const [currentTime, setCurrentTime] = useState(0)
     const [duration, setDuration] = useState(0)
-    const [isPlaying, setIsPlaying] = useState(false)
+    const [isPlaying, setIsPlaying] = useState(true)
     const audioRef = useRef<HTMLAudioElement>(null)
-    const [value, setValue] = useState(25)
+    const [value, setValue] = useState(75)
 
     const handleVolumeChange = (value: number | number[]) => {
         const newValue = Array.isArray(value) ? value[0] : value
@@ -54,6 +64,13 @@ export default function MusicPlayer({ audioUrl }: { audioUrl: string }) {
         if (audio) {
             const setAudioData = () => {
                 setDuration(audio.duration)
+                if (isPlaying) {
+                    audio
+                        .play()
+                        .catch((err) =>
+                            console.error("Error playing audio:", err)
+                        )
+                }
             }
 
             const updateAudioTime = () => {
@@ -68,7 +85,7 @@ export default function MusicPlayer({ audioUrl }: { audioUrl: string }) {
                 audio.removeEventListener("timeupdate", updateAudioTime)
             }
         }
-    }, [])
+    }, [isPlaying])
 
     return (
         <Card
@@ -95,13 +112,13 @@ export default function MusicPlayer({ audioUrl }: { audioUrl: string }) {
                         alt="Album cover"
                         className="object-cover"
                         shadow="md"
-                        src="https://firebasestorage.googleapis.com/v0/b/melodyhub-e6e1a.appspot.com/o/track_image%2F3D.jpg?alt=media&token=62a5dfef-9bed-448c-86ef-72c93ac34a9e"
+                        src={imageUrl}
                         height="52px"
                         width="52px"
                     />
                     <p className="ml-4 font-bold">
-                        Example Music <span className="text-success">by</span>{" "}
-                        Author
+                        {trackName} <span className="text-success">by</span>{" "}
+                        {artistName}
                     </p>
                 </div>
                 <div className="flex justify-between ml-12 items-center">
@@ -156,7 +173,7 @@ export default function MusicPlayer({ audioUrl }: { audioUrl: string }) {
                         >
                             <ShuffleIcon className="text-foreground/80" />
                         </Button>
-                        <audio ref={audioRef} src={audioUrl} />
+                        <audio ref={audioRef} src={trackUrl} />
                     </div>
                     <p className="text-small text-foreground/50">
                         {new Date(duration * 1000).toISOString().substr(14, 5)}

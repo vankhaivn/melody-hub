@@ -22,7 +22,7 @@ import { PlayIcon } from "@/components/icons/PlayIcon"
 import { useMusicPlayer } from "@/components/MusicPlayer/MusicPlayerContext"
 import useSWR from "swr"
 import { useState, useMemo } from "react"
-import { formatView } from "@/utils/format"
+import { formatView, formatDuration } from "@/utils/format"
 
 export default function ArtistPage() {
     const artistFetcher = () => get_all_artists()
@@ -268,6 +268,7 @@ const RenderModal = ({
                                 <TableColumn key="order">#</TableColumn>
                                 <TableColumn key="name">NAME</TableColumn>
                                 <TableColumn key="role">VIEW</TableColumn>
+                                <TableColumn key="role">DURATION</TableColumn>
                                 <TableColumn key="status">
                                     RELEASE YEAR
                                 </TableColumn>
@@ -283,9 +284,15 @@ const RenderModal = ({
                                     <TableRow
                                         key={item.track_name}
                                         className="cursor-pointer"
-                                        onClick={() =>
-                                            showPlayer(item.track_url)
-                                        }
+                                        onClick={() => {
+                                            showPlayer({
+                                                trackName: item.track_name,
+                                                imageUrl: item.image_url,
+                                                artistName: artist.artist_name,
+                                                trackUrl: item.track_url,
+                                            })
+                                            onClose()
+                                        }}
                                     >
                                         <TableCell className="font-semibold group-hover:text-success-500 transition-colors duration-400">
                                             {item.rowIndex}
@@ -301,6 +308,9 @@ const RenderModal = ({
                                         </TableCell>
                                         <TableCell className="font-semibold group-hover:text-success-500 transition-colors duration-400">
                                             {formatView(item.view)}
+                                        </TableCell>
+                                        <TableCell className="font-semibold group-hover:text-success-500 transition-colors duration-400">
+                                            {formatDuration(item.duration)}
                                         </TableCell>
                                         <TableCell className="font-semibold group-hover:text-success-500 transition-colors duration-400">
                                             {item.release_year}

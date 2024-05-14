@@ -8,9 +8,22 @@ import React, {
 import MusicPlayer from "./MusicPlayer"
 
 interface MusicPlayerContextType {
-    showPlayer: (url: string) => void
+    showPlayer: ({
+        trackUrl,
+        trackName,
+        imageUrl,
+        artistName,
+    }: {
+        trackUrl: string
+        trackName: string
+        imageUrl: string
+        artistName: string
+    }) => void
     hidePlayer: () => void
     trackUrl: string
+    trackName: string
+    imageUrl: string
+    artistName: string
     isVisible: boolean
 }
 
@@ -33,28 +46,60 @@ interface MusicPlayerProviderProps {
 export const MusicPlayerProvider = ({ children }: MusicPlayerProviderProps) => {
     const [isVisible, setIsVisible] = useState(false)
     const [trackUrl, setTrackUrl] = useState("")
+    const [trackName, setTrackName] = useState("")
+    const [imageUrl, setImageUrl] = useState("")
+    const [artistName, setArtistName] = useState("")
 
-    const showPlayer = useCallback((url: string) => {
-        setTrackUrl(url)
-        setIsVisible(true)
-    }, [])
+    const showPlayer = useCallback(
+        ({
+            trackUrl,
+            trackName,
+            imageUrl,
+            artistName,
+        }: {
+            trackUrl: string
+            trackName: string
+            imageUrl: string
+            artistName: string
+        }) => {
+            setTrackUrl(trackUrl)
+            setTrackName(trackName)
+            setImageUrl(imageUrl)
+            setArtistName(artistName)
+            setIsVisible(true)
+        },
+        []
+    )
 
     const hidePlayer = useCallback(() => {
         setIsVisible(false)
         setTrackUrl("")
+        setTrackName("")
+        setImageUrl("")
+        setArtistName("")
     }, [])
 
     const value = {
         showPlayer,
         hidePlayer,
         trackUrl,
+        trackName,
+        imageUrl,
+        artistName,
         isVisible,
     }
 
     return (
         <MusicPlayerContext.Provider value={value}>
             {children}
-            {<MusicPlayer audioUrl={trackUrl} />}
+            {
+                <MusicPlayer
+                    trackUrl={trackUrl}
+                    artistName={artistName}
+                    imageUrl={imageUrl}
+                    trackName={trackName}
+                />
+            }
         </MusicPlayerContext.Provider>
     )
 }
