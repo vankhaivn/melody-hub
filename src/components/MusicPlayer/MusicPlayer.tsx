@@ -216,14 +216,12 @@ export default function MusicPlayer({
                         }
                         className="max-w-md"
                     />
-                    <Button
-                        isIconOnly
-                        color="danger"
-                        variant="ghost"
+                    <div
                         onClick={hidePlayer}
+                        className="text-danger-500 text-2xl font-bold cursor-pointer hover:text-danger-300 transition-colors duration-300 mt-1 ml-4"
                     >
                         X
-                    </Button>
+                    </div>
                 </div>
             </div>
         </Card>

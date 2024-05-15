@@ -7,3 +7,16 @@ export function formatDuration(seconds: number): string {
     const remainingSeconds = seconds % 60
     return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`
 }
+
+export function formatTrackName({
+    trackName,
+    characters,
+}: {
+    trackName: string
+    characters: number
+}): string {
+    if (trackName.length > characters) {
+        return `${trackName.slice(0, characters)}...`
+    }
+    return trackName
+}
