@@ -1,4 +1,4 @@
-export const MusicIcon = ({ size = 32 }) => (
+export const MusicIcon = ({ size = 28 }) => (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
         <path
             d="M12 17C12 17.8284 11.3284 18.5 10.5 18.5C9.67157 18.5 9 17.8284 9 17C9 16.1716 9.67157 15.5 10.5 15.5C11.3284 15.5 12 16.1716 12 17ZM12 17V10.5C12 12.1569 13.8954 13.5 15 13.5"

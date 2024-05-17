@@ -1,5 +1,5 @@
 import React from "react"
-export const AlbumIcon = ({ size = 32 }) => (
+export const AlbumIcon = ({ size = 28 }) => (
     <svg
         className="text-default-900 group-data-[selected=true]:text-foreground iconify iconify--solar"
         width={size}
