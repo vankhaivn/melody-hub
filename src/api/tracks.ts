@@ -15,12 +15,12 @@ export const get_all_tracks = async () => {
 
 export const get_top_trending_tracks = async (limit: number) => {
     try {
-        const url = `${baseUrl}/tracks/get-top-trending-tracks?limit=${limit}`
+        const url = `${baseUrl}/track/get-top-trending-tracks?limit=${limit}`
         const response = await axios.get(url)
-        const artists: IArtist[] = response.data
-        return artists
+        const tracks: ITrack[] = response.data
+        return tracks
     } catch (error) {
-        console.error("Error fetching artists:", error)
+        console.error("Error fetching tracks:", error)
         return []
     }
 }

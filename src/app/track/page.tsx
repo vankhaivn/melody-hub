@@ -6,7 +6,9 @@ import { useMusicPlayer } from "@/components/MusicPlayer/MusicPlayerContext"
 import { formatDuration, formatTrackName, formatView } from "@/utils/format"
 import { ShuffleIcon } from "@/components/icons/ShuffleIcon"
 import { useState } from "react"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import useSWR from "swr"
+import { faClock, faEye, faUserPen } from "@fortawesome/free-solid-svg-icons"
 
 export default function TrackPage() {
     const [isShuffle, setIsShuffle] = useState(false)
@@ -171,40 +173,52 @@ const PopularTracks = () => {
     return (
         <div className="grid grid-cols-6">
             {popularTracks.map((track, index) => (
-                <div
-                    key={index}
-                    className="flex flex-col justify-center items-center p-4 cursor-pointer rounded-lg hover:bg-zinc-900 duration-500 relative group"
-                    onClick={() =>
-                        showPlayer({
-                            trackUrl: track.track_url,
-                            trackName: track.track_name,
-                            imageUrl: track.image_url,
-                            artistName: track.artist_name,
-                        })
-                    }
-                >
-                    <div className="relative">
-                        <Avatar
-                            radius="sm"
-                            src={track.image_url}
-                            className="w-40 h-40 hover:scale-105 transition-transform duration-300"
+                <Tooltip
+                    showArrow={true}
+                    content={
+                        <SubInfo
+                            view={track.view}
+                            artist={track.artist_name}
+                            duration={track.duration}
                         />
-                        <div className="absolute bottom-0 -right-4 translate-y-8 opacity-0 group-hover:opacity-100 group-hover:translate-y-4 transition-all duration-500 ease-out">
-                            <PlayIcon color="var(--primary)" size={48} />
+                    }
+                    color="success"
+                >
+                    <div
+                        key={index}
+                        className="flex flex-col justify-center items-center p-4 cursor-pointer rounded-lg hover:bg-zinc-900 duration-500 relative group"
+                        onClick={() =>
+                            showPlayer({
+                                trackUrl: track.track_url,
+                                trackName: track.track_name,
+                                imageUrl: track.image_url,
+                                artistName: track.artist_name,
+                            })
+                        }
+                    >
+                        <div className="relative">
+                            <Avatar
+                                radius="sm"
+                                src={track.image_url}
+                                className="w-40 h-40 hover:scale-105 transition-transform duration-300"
+                            />
+                            <div className="absolute bottom-0 -right-4 translate-y-8 opacity-0 group-hover:opacity-100 group-hover:translate-y-4 transition-all duration-500 ease-out">
+                                <PlayIcon color="var(--primary)" size={48} />
+                            </div>
+                        </div>
+                        <div className="w-full mt-2 px-2">
+                            <p className="text-medium font-semibold">
+                                {formatTrackName({
+                                    trackName: track.track_name,
+                                    characters: 18,
+                                })}
+                            </p>
+                            <p className="text-default-400 text-sm">
+                                {track.artist_name}
+                            </p>
                         </div>
                     </div>
-                    <div className="w-full mt-2 px-2">
-                        <p className="text-medium font-semibold">
-                            {formatTrackName({
-                                trackName: track.track_name,
-                                characters: 18,
-                            })}
-                        </p>
-                        <p className="text-default-400 text-sm">
-                            {track.artist_name}
-                        </p>
-                    </div>
-                </div>
+                </Tooltip>
             ))}
         </div>
     )
@@ -219,7 +233,7 @@ const LoadingSpacer = () => {
                     key={index}
                 >
                     <div className="w-full">
-                        <Skeleton className="rounded-full w-36 h-36"></Skeleton>
+                        <Skeleton className="rounded-md w-40 h-40"></Skeleton>
                         <Skeleton className="rounded-sm w-36 h-6 mt-2"></Skeleton>
                         <Skeleton className="rounded-sm w-28 h-6 mt-2"></Skeleton>
                     </div>
@@ -240,21 +254,19 @@ const SubInfo = ({
 }) => {
     return (
         <div className="p-2">
-            <div className="text-large">
-                This songs has been played{" "}
-                <span className="font-bold">{formatView(view)}</span> times
-            </div>
-            <div className="text-medium">
-                <p>
-                    A{" "}
-                    <span className="font-bold">
-                        {formatDuration(duration)}
-                    </span>{" "}
-                    auditory odyssey
-                </p>
-                <p>
-                    Created by <span className="font-bold">{artist}</span>{" "}
-                </p>
+            <div className="text-large font-bold">
+                <div>
+                    <FontAwesomeIcon icon={faEye} />
+                    <span className="ml-2">{formatView(view)}</span>
+                </div>
+                <div>
+                    <FontAwesomeIcon icon={faClock} />
+                    <span className="ml-2">{formatDuration(duration)}</span>
+                </div>
+                <div>
+                    <FontAwesomeIcon icon={faUserPen} />
+                    <span className="ml-2">{artist}</span>
+                </div>
             </div>
         </div>
     )

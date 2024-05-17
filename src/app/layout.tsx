@@ -6,6 +6,9 @@ import AppHeader from "@/components/AppHeader"
 import AppSidebar from "@/components/AppSidebar"
 import { ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
+import "@fortawesome/fontawesome-svg-core/styles.css"
+import { config } from "@fortawesome/fontawesome-svg-core"
+config.autoAddCss = false
 
 const nunito = Nunito({ subsets: ["latin"] })
 export const metadata: Metadata = {
