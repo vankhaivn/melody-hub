@@ -34,8 +34,27 @@ body {
 
 :root {
     --primary: #22ce67;
+    --danger: #ff3d71;
+    --blue: #00a8ff;
+    --dark-1: #18181b;
+    --gray: #27272a;
 }
 
 input:-webkit-autofill {
     transition: background-color 9999s ease-in-out 0s;
+}
+
+*::-webkit-scrollbar {
+    width: 8px;
+}
+
+*::-webkit-scrollbar-track {
+    background: var(--dark-1);
+    border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb {
+    background-color: var(--gray);
+    border-radius: 12px;
+    border: 2px solid var(--dark-1);
 }

@@ -14,7 +14,7 @@ import {
     Avatar,
 } from "@nextui-org/react"
 
-import { SearchIcon } from "@/components/icons/SearchIcon"
+import { SearchIcon } from "@/components/icons"
 
 export default function AppHeader() {
     return (
@@ -80,7 +80,7 @@ export default function AppHeader() {
                             className="transition-transform"
                             color="secondary"
                             name="Jason Hughes"
-                            size="sm"
+                            size="md"
                             src="https://i.pravatar.cc/150?u=a042581f4e29026704d"
                         />
                     </DropdownTrigger>
@@ -89,7 +89,7 @@ export default function AppHeader() {
                             <p className="font-semibold">Signed in as</p>
                             <p className="font-semibold">zoey@example.com</p>
                         </DropdownItem>
-                        <DropdownItem key="settings">My Settings</DropdownItem>
+                        <DropdownItem key="settings">My Profile</DropdownItem>
                         <DropdownItem key="team_settings">
                             Team Settings
                         </DropdownItem>

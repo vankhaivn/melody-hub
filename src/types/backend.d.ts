@@ -15,3 +15,10 @@ interface ITrack {
     artist_name: string
     genres_name: string
 }
+
+interface IPlaylist {
+    playlist_id: string
+    playlist_name: string
+    tracks: ITrack[]
+    total_duration: number
+}

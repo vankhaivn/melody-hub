@@ -18,7 +18,7 @@ import {
     Pagination,
     Spinner,
 } from "@nextui-org/react"
-import { PlayIcon } from "@/components/icons/PlayIcon"
+import { PlayIcon } from "@/components/icons"
 import { useMusicPlayer } from "@/components/MusicPlayer/MusicPlayerContext"
 import useSWR from "swr"
 import { useState, useMemo } from "react"
@@ -319,7 +319,7 @@ const RenderModal = ({
                                             <PlayIcon
                                                 color="var(--primary)"
                                                 size={32}
-                                                className="mb-1 group-hover:scale-150 transition-transform duration-400 cursor-pointer"
+                                                className="mb-1 group-hover:scale-125 transition-transform duration-400 cursor-pointer"
                                             />
                                         </TableCell>
                                     </TableRow>

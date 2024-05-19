@@ -1,10 +1,9 @@
 "use client"
 import { Divider, Avatar, Skeleton, Switch, Tooltip } from "@nextui-org/react"
-import { PlayIcon } from "@/components/icons/PlayIcon"
+import { PlayIcon, ShuffleIcon } from "@/components/icons"
 import { get_shuffle_tracks } from "@/api/tracks"
 import { useMusicPlayer } from "@/components/MusicPlayer/MusicPlayerContext"
 import { formatDuration, formatTrackName, formatView } from "@/utils/format"
-import { ShuffleIcon } from "@/components/icons/ShuffleIcon"
 import { useState } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import useSWR from "swr"
@@ -233,7 +232,7 @@ const LoadingSpacer = () => {
                     key={index}
                 >
                     <div className="w-full">
-                        <Skeleton className="rounded-md w-40 h-40"></Skeleton>
+                        <Skeleton className="rounded-md w-36 h-36"></Skeleton>
                         <Skeleton className="rounded-sm w-36 h-6 mt-2"></Skeleton>
                         <Skeleton className="rounded-sm w-28 h-6 mt-2"></Skeleton>
                     </div>
@@ -265,7 +264,7 @@ const SubInfo = ({
                 </div>
                 <div>
                     <FontAwesomeIcon icon={faUserPen} />
-                    <span className="ml-2">{artist}</span>
+                    <span className="ml-1">{artist}</span>
                 </div>
             </div>
         </div>

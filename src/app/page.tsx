@@ -7,7 +7,7 @@ import {
     Button,
     Divider,
 } from "@nextui-org/react"
-import { AcmeLogo } from "@/components/icons/AcmeLogo"
+import { AcmeLogo } from "@/components/icons/components/AcmeLogo"
 import { toast } from "react-toastify"
 import { useMusicPlayer } from "@/components/MusicPlayer/MusicPlayerContext"
 import { get_all_artists } from "@/api/artists"

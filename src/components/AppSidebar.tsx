@@ -1,12 +1,14 @@
 "use client"
-import { AcmeLogo } from "@/components/icons/AcmeLogo"
-import { AlbumIcon } from "@/components/icons/AlbumIcon"
-import { HomeIcon } from "@/components/icons/HomeIcon"
-import { MusicIcon } from "@/components/icons/MusicIcon"
-import { LogOutIcon } from "@/components/icons/LogOutIcon"
-import { LogInIcon } from "@/components/icons/LogInIcon"
-import { MailIcon } from "@/components/icons/MailIcon"
-import { LockIcon } from "@/components/icons/LockIcon"
+import {
+    AcmeLogo,
+    AlbumIcon,
+    HomeIcon,
+    MusicIcon,
+    LogOutIcon,
+    LogInIcon,
+    MailIcon,
+    LockIcon,
+} from "@/components/icons"
 import { usePathname } from "next/navigation"
 import {
     Modal,
@@ -21,7 +23,10 @@ import {
     Divider,
 } from "@nextui-org/react"
 
+import { useState } from "react"
 import Link from "next/link"
+import { registerValidation } from "@/utils/valid"
+import { toast } from "react-toastify"
 
 export default function AppSidebar() {
     const currentPath = usePathname()
@@ -44,10 +49,6 @@ export default function AppSidebar() {
                             <p className="text-xl ml-3 font-semibold">Home</p>
                         </Link>
                     </li>
-                    <li className="flex items-center py-3 px-4 hover:bg-zinc-800 transition-colors duration-600 cursor-pointer rounded-2xl">
-                        <AlbumIcon />
-                        <p className="text-xl ml-3 font-semibold">Album</p>
-                    </li>
                     <li>
                         <Link
                             href="/track"
@@ -64,6 +65,17 @@ export default function AppSidebar() {
                         >
                             <MusicIcon />
                             <p className="text-xl ml-3 font-semibold">Artist</p>
+                        </Link>
+                    </li>
+                    <li>
+                        <Link
+                            href="/playlist"
+                            className={getLinkClassName("/playlist")}
+                        >
+                            <AlbumIcon />
+                            <p className="text-xl ml-3 font-semibold">
+                                My Playlist
+                            </p>
                         </Link>
                     </li>
                 </ul>
@@ -103,74 +115,198 @@ const LoginModal = ({
     isOpen: any
     onOpenChange: any
 }) => {
+    const [modalMode, setModalMode] = useState<"login" | "register">("login")
+    const [email, setEmail] = useState("")
+    const [fullname, setFullname] = useState("")
+    const [password, setPassword] = useState("")
+    const [confirmPassword, setConfirmPassword] = useState("")
+
+    const registerSubmit = (
+        email: string,
+        fullname: string,
+        password: string,
+        confirmPassword: string
+    ) => {
+        if (registerValidation(email, fullname, password, confirmPassword)) {
+            toast.success("Register successfully")
+            onOpenChange()
+            setModalMode("login")
+        }
+    }
+
     return (
         <Modal
             isOpen={isOpen}
             onOpenChange={onOpenChange}
+            hideCloseButton
             placement="top-center"
             backdrop="blur"
             size="lg"
             className="py-2"
         >
-            <ModalContent>
-                {(onClose) => (
-                    <>
-                        <ModalHeader className="text-2xl font-bold">
-                            Log in
-                        </ModalHeader>
-                        <ModalBody>
-                            <Input
-                                autoFocus
-                                endContent={
-                                    <MailIcon className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
-                                }
-                                label="Email"
-                                placeholder="Enter your email"
-                                variant="bordered"
-                                size="lg"
-                                className="mb-2"
-                            />
-                            <Input
-                                endContent={
-                                    <LockIcon className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
-                                }
-                                label="Password"
-                                placeholder="Enter your password"
-                                type="password"
-                                variant="bordered"
-                                size="lg"
-                            />
-                            <div className="flex py-2 px-1 justify-between">
-                                <Checkbox
-                                    classNames={{
-                                        label: "text-small",
-                                    }}
+            {modalMode === "login" ? (
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader className="flex justify-between">
+                                <div className="text-2xl font-bold">Log in</div>
+                                <div
+                                    onClick={() => setModalMode("register")}
+                                    className="text-primary font-bold text-xl cursor-pointer"
                                 >
-                                    Remember me
-                                </Checkbox>
-                                <Link
-                                    href="#"
-                                    className="text-primary font-bold"
+                                    Register
+                                </div>
+                            </ModalHeader>
+                            <ModalBody>
+                                <Input
+                                    autoFocus
+                                    endContent={
+                                        <MailIcon className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
+                                    }
+                                    label="Email"
+                                    variant="bordered"
+                                    size="lg"
+                                    className="mb-2"
+                                    type="email"
+                                />
+                                <Input
+                                    endContent={
+                                        <LockIcon className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
+                                    }
+                                    label="Password"
+                                    type="password"
+                                    variant="bordered"
+                                    size="lg"
+                                />
+                                <div className="flex py-2 px-1 justify-between">
+                                    <Checkbox
+                                        classNames={{
+                                            label: "text-small",
+                                        }}
+                                    >
+                                        Remember me
+                                    </Checkbox>
+                                    <Link
+                                        href="#"
+                                        className="text-primary font-bold"
+                                    >
+                                        Forgot password?
+                                    </Link>
+                                </div>
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button
+                                    color="danger"
+                                    variant="flat"
+                                    onPress={onClose}
                                 >
-                                    Forgot password?
-                                </Link>
-                            </div>
-                        </ModalBody>
-                        <ModalFooter>
-                            <Button
-                                color="danger"
-                                variant="flat"
-                                onPress={onClose}
-                            >
-                                Close
-                            </Button>
-                            <Button color="primary" onPress={onClose}>
-                                Sign in
-                            </Button>
-                        </ModalFooter>
-                    </>
-                )}
-            </ModalContent>
+                                    Close
+                                </Button>
+                                <Button color="primary" onPress={onClose}>
+                                    Sign in
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            ) : (
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader className="flex justify-between">
+                                <div className="text-2xl font-bold">
+                                    Register
+                                </div>
+                                <div
+                                    onClick={() => setModalMode("login")}
+                                    className="text-primary font-bold text-xl cursor-pointer"
+                                >
+                                    Login
+                                </div>
+                            </ModalHeader>
+                            <ModalBody>
+                                <Input
+                                    autoFocus
+                                    endContent={
+                                        <MailIcon className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
+                                    }
+                                    label="Email"
+                                    variant="bordered"
+                                    size="lg"
+                                    className="mb-2"
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                />
+                                <Input
+                                    autoFocus
+                                    endContent={
+                                        <MailIcon className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
+                                    }
+                                    label="Fullname"
+                                    variant="bordered"
+                                    size="lg"
+                                    className="mb-2"
+                                    type="string"
+                                    value={fullname}
+                                    onChange={(e) =>
+                                        setFullname(e.target.value)
+                                    }
+                                />
+                                <Input
+                                    endContent={
+                                        <LockIcon className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
+                                    }
+                                    label="Password"
+                                    type="password"
+                                    variant="bordered"
+                                    size="lg"
+                                    className="mb-2"
+                                    value={password}
+                                    onChange={(e) =>
+                                        setPassword(e.target.value)
+                                    }
+                                />
+                                <Input
+                                    endContent={
+                                        <LockIcon className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
+                                    }
+                                    label="Confirm Password"
+                                    type="password"
+                                    variant="bordered"
+                                    size="lg"
+                                    value={confirmPassword}
+                                    onChange={(e) =>
+                                        setConfirmPassword(e.target.value)
+                                    }
+                                />
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button
+                                    color="danger"
+                                    variant="flat"
+                                    onPress={onClose}
+                                >
+                                    Close
+                                </Button>
+                                <Button
+                                    color="primary"
+                                    onPress={() =>
+                                        registerSubmit(
+                                            email,
+                                            fullname,
+                                            password,
+                                            confirmPassword
+                                        )
+                                    }
+                                >
+                                    Register
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            )}
         </Modal>
     )
 }

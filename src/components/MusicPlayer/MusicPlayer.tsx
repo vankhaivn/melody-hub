@@ -1,14 +1,16 @@
 "use client"
 import { useState, useRef, useEffect } from "react"
-import { Card, CardBody, Image, Button, Slider } from "@nextui-org/react"
-import { PauseCircleIcon } from "../icons/PauseCircleIcon"
-import { NextIcon } from "../icons/NextIcon"
-import { PreviousIcon } from "../icons/PreviousIcon"
-import { RepeatOneIcon } from "../icons/RepeatOneIcon"
-import { ShuffleIcon } from "../icons/ShuffleIcon"
-import { PlayIcon } from "../icons/PlayIcon"
-import { VolumeHighIcon } from "../icons/VolumeHighIcon"
-import { VolumeLowIcon } from "../icons/VolumeLowIcon"
+import { Card, Image, Button, Slider } from "@nextui-org/react"
+import {
+    PauseCircleIcon,
+    NextIcon,
+    PreviousIcon,
+    RepeatOneIcon,
+    ShuffleIcon,
+    PlayIcon,
+    VolumeHighIcon,
+    VolumeLowIcon,
+} from "@/components/icons"
 import { useMusicPlayer } from "@/components/MusicPlayer/MusicPlayerContext"
 
 export default function MusicPlayer({
