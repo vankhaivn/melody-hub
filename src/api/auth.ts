@@ -29,11 +29,32 @@ export const login = async (email: string, password: string) => {
             password,
         })
         if (response.data.token) {
-            Cookies.set("token", response.data.token)
+            Cookies.set("token", response.data.token, { expires: 7 })
         }
         return response.data
     } catch (error) {
         console.error("Login error:", error)
+        return null
+    }
+}
+
+export const validateToken = async () => {
+    try {
+        const url = `${baseUrl}/account/validate-token`
+        const response = await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${Cookies.get("token")}`,
+            },
+        })
+        if (response.data) {
+            console.log("Token is valid")
+        } else {
+            console.log("Token is invalid")
+        }
+        console.log(response.data)
+        return response.data
+    } catch (error) {
+        console.error("Validate token error:", error)
         return null
     }
 }

@@ -23,12 +23,14 @@ import {
     Divider,
 } from "@nextui-org/react"
 
-import { useState } from "react"
+import Cookies from "js-cookie"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { registerValidation, loginValidation } from "@/utils/valid"
 import { toast } from "react-toastify"
 
 import { register, login } from "@/api/auth"
+import { isLogin as checkLogin } from "@/utils/auth"
 
 export default function AppSidebar() {
     const currentPath = usePathname()
@@ -38,7 +40,18 @@ export default function AppSidebar() {
         } transition-colors duration-600 cursor-pointer rounded-2xl`
     }
 
+    const logout = () => {
+        Cookies.remove("token")
+        window.location.reload()
+    }
+
     const { isOpen, onOpen, onOpenChange } = useDisclosure()
+
+    const [isLoggedIn, setIsLoggedIn] = useState(false)
+
+    useEffect(() => {
+        setIsLoggedIn(checkLogin())
+    }, [])
 
     return (
         <div className="fixed h-full w-1/6 border-r-small border-divider pt-2 top-0 left-0 flex flex-col justify-between">
@@ -83,20 +96,32 @@ export default function AppSidebar() {
                 </ul>
                 <ul className="px-4 py-4 gap-y-2 flex flex-col">
                     <Divider className="mb-2" />
-                    <li className="flex items-center py-3 px-4 hover:bg-zinc-800 transition-colors duration-600 cursor-pointer rounded-2xl">
-                        <LogOutIcon />
-                        <p className="text-xl ml-3 font-semibold">Log Out</p>
-                    </li>
-                    <li
-                        className="flex items-center py-3 px-4 hover:bg-zinc-800 transition-colors duration-600 cursor-pointer rounded-2xl"
-                        onClick={onOpen}
-                    >
-                        <LogInIcon />
-                        <p className="text-xl ml-3 font-semibold">Log In</p>
-                    </li>
+                    {isLoggedIn ? (
+                        <li
+                            className="flex items-center py-3 px-4 hover:bg-zinc-800 transition-colors duration-600 cursor-pointer rounded-2xl"
+                            onClick={logout}
+                        >
+                            <LogOutIcon />
+                            <p className="text-xl ml-3 font-semibold">
+                                Log Out
+                            </p>
+                        </li>
+                    ) : (
+                        <li
+                            className="flex items-center py-3 px-4 hover:bg-zinc-800 transition-colors duration-600 cursor-pointer rounded-2xl"
+                            onClick={onOpen}
+                        >
+                            <LogInIcon />
+                            <p className="text-xl ml-3 font-semibold">Log In</p>
+                        </li>
+                    )}
                 </ul>
             </div>
-            <LoginModal isOpen={isOpen} onOpenChange={onOpenChange} />
+            <LoginModal
+                isOpen={isOpen}
+                onOpenChange={onOpenChange}
+                setIsLoggedIn={setIsLoggedIn}
+            />
         </div>
     )
 }
@@ -113,9 +138,11 @@ const Logo = () => (
 const LoginModal = ({
     isOpen,
     onOpenChange,
+    setIsLoggedIn,
 }: {
     isOpen: any
     onOpenChange: any
+    setIsLoggedIn: any
 }) => {
     const [modalMode, setModalMode] = useState<"login" | "register">("login")
     const [email, setEmail] = useState("")
@@ -155,6 +182,7 @@ const LoginModal = ({
                 const response = await login(email, password)
                 if (response) {
                     toast.success("Login successfully!")
+                    setIsLoggedIn(checkLogin())
                     onOpenChange()
                 }
             } catch (error) {
