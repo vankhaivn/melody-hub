@@ -25,8 +25,10 @@ import {
 
 import { useState } from "react"
 import Link from "next/link"
-import { registerValidation } from "@/utils/valid"
+import { registerValidation, loginValidation } from "@/utils/valid"
 import { toast } from "react-toastify"
+
+import { register, login } from "@/api/auth"
 
 export default function AppSidebar() {
     const currentPath = usePathname()
@@ -120,17 +122,47 @@ const LoginModal = ({
     const [fullname, setFullname] = useState("")
     const [password, setPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
+    const [isLoading, setIsLoading] = useState(false)
 
-    const registerSubmit = (
+    const registerSubmit = async (
         email: string,
         fullname: string,
         password: string,
         confirmPassword: string
     ) => {
         if (registerValidation(email, fullname, password, confirmPassword)) {
-            toast.success("Register successfully")
-            onOpenChange()
-            setModalMode("login")
+            try {
+                setIsLoading(true)
+                const response = await register(email, fullname, password)
+                if (response) {
+                    toast.success("Register successfully!")
+                    onOpenChange()
+                    setModalMode("login")
+                }
+            } catch (error) {
+                toast.error("Register failed!")
+                return null
+            } finally {
+                setIsLoading(false)
+            }
+        }
+    }
+
+    const loginSubmit = async (email: string, password: string) => {
+        if (loginValidation(email, password)) {
+            try {
+                setIsLoading(true)
+                const response = await login(email, password)
+                if (response) {
+                    toast.success("Login successfully!")
+                    onOpenChange()
+                }
+            } catch (error) {
+                toast.error("Login failed!")
+                return null
+            } finally {
+                setIsLoading(false)
+            }
         }
     }
 
@@ -168,6 +200,8 @@ const LoginModal = ({
                                     size="lg"
                                     className="mb-2"
                                     type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
                                 />
                                 <Input
                                     endContent={
@@ -177,6 +211,10 @@ const LoginModal = ({
                                     type="password"
                                     variant="bordered"
                                     size="lg"
+                                    value={password}
+                                    onChange={(e) =>
+                                        setPassword(e.target.value)
+                                    }
                                 />
                                 <div className="flex py-2 px-1 justify-between">
                                     <Checkbox
@@ -202,7 +240,11 @@ const LoginModal = ({
                                 >
                                     Close
                                 </Button>
-                                <Button color="primary" onPress={onClose}>
+                                <Button
+                                    color="primary"
+                                    onPress={() => loginSubmit(email, password)}
+                                    isLoading={isLoading}
+                                >
                                     Sign in
                                 </Button>
                             </ModalFooter>
@@ -299,6 +341,7 @@ const LoginModal = ({
                                             confirmPassword
                                         )
                                     }
+                                    isLoading={isLoading}
                                 >
                                     Register
                                 </Button>

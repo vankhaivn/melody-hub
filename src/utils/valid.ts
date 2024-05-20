@@ -33,3 +33,22 @@ export const registerValidation = (
 
     return true
 }
+
+export const loginValidation = (email: string, password: string) => {
+    if (!email || !password) {
+        toast.error("All fields are required")
+        return false
+    }
+
+    if (!validateEmail(email)) {
+        toast.error("Invalid email")
+        return false
+    }
+
+    if (password.length < 6) {
+        toast.error("Password must be at least 6 characters")
+        return false
+    }
+
+    return true
+}

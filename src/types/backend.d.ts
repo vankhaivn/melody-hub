@@ -20,5 +20,6 @@ interface IPlaylist {
     playlist_id: string
     playlist_name: string
     tracks: ITrack[]
+    recommended_tracks: ITrack[]
     total_duration: number
 }
