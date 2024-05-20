@@ -8,7 +8,7 @@ export const register = async (
     password: string
 ) => {
     try {
-        const url = `${baseUrl}/account/signup`
+        const url = `${baseUrl}/auth/signup`
         const response = await axios.post(url, {
             email,
             username,
@@ -23,7 +23,7 @@ export const register = async (
 
 export const login = async (email: string, password: string) => {
     try {
-        const url = `${baseUrl}/account/login`
+        const url = `${baseUrl}/auth/login`
         const response = await axios.post(url, {
             email,
             password,
@@ -45,10 +45,10 @@ export const validateToken = async () => {
         return false
     }
     try {
-        const url = `${baseUrl}/account/validate-token`
+        const url = `${baseUrl}/auth/validate-token`
         const response = await axios.get(url, {
             headers: {
-                Authorization: `Bearer ${Cookies.get("token")}`,
+                Authorization: `Bearer ${token}`,
             },
         })
         if (response.data) {

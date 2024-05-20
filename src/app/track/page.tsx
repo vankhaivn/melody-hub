@@ -5,6 +5,7 @@ import { get_shuffle_tracks } from "@/api/tracks"
 import { useMusicPlayer } from "@/context/MusicPlayerContext"
 import { formatDuration, formatTrackName, formatView } from "@/utils/format"
 import { useState } from "react"
+import { useAddToPlaylistContext } from "@/context/AddToPlaylistContext"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import useSWR from "swr"
 import { faClock, faEye, faUserPen } from "@fortawesome/free-solid-svg-icons"
@@ -97,6 +98,7 @@ const ShuffleTracks = () => {
         <div className="grid grid-cols-6">
             {shuffleTracks.map((track, index) => (
                 <Tooltip
+                    key={index}
                     showArrow={true}
                     content={
                         <SubInfo
@@ -107,25 +109,28 @@ const ShuffleTracks = () => {
                     }
                     color="success"
                 >
-                    <div
-                        key={index}
-                        className="flex flex-col justify-center items-center p-4 cursor-pointer rounded-lg hover:bg-zinc-900 duration-500 relative group"
-                        onClick={() =>
-                            showPlayer({
-                                trackUrl: track.track_url,
-                                trackName: track.track_name,
-                                imageUrl: track.image_url,
-                                artistName: track.artist_name,
-                            })
-                        }
-                    >
+                    <div className="flex flex-col justify-center items-center p-4 cursor-pointer rounded-lg hover:bg-zinc-900 duration-500 relative group">
                         <div className="relative">
                             <Avatar
                                 radius="sm"
                                 src={track.image_url}
                                 className="w-40 h-40 hover:scale-105 transition-transform duration-300"
                             />
-                            <div className="absolute bottom-0 -right-4 translate-y-8 opacity-0 group-hover:opacity-100 group-hover:translate-y-4 transition-all duration-500 ease-out">
+                            <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 translate-y-8 opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 ease-out">
+                                <AddIcon color="var(--blue-1)" size={32} />
+                            </div>
+
+                            <div
+                                className="absolute inset-0 translate-y-8 flex items-center justify-center opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 ease-out"
+                                onClick={() =>
+                                    showPlayer({
+                                        trackUrl: track.track_url,
+                                        trackName: track.track_name,
+                                        imageUrl: track.image_url,
+                                        artistName: track.artist_name,
+                                    })
+                                }
+                            >
                                 <PlayIcon color="var(--primary)" size={48} />
                             </div>
                         </div>
@@ -149,6 +154,8 @@ const ShuffleTracks = () => {
 
 const PopularTracks = () => {
     const popularTracksFetcher = () => get_shuffle_tracks(12)
+    const { showModal } = useAddToPlaylistContext()
+
     const {
         data: popularTracks,
         error: popularTracksError,
@@ -173,6 +180,7 @@ const PopularTracks = () => {
         <div className="grid grid-cols-6">
             {popularTracks.map((track, index) => (
                 <Tooltip
+                    key={index}
                     showArrow={true}
                     content={
                         <SubInfo
@@ -183,25 +191,31 @@ const PopularTracks = () => {
                     }
                     color="success"
                 >
-                    <div
-                        key={index}
-                        className="flex flex-col justify-center items-center p-4 cursor-pointer rounded-lg hover:bg-zinc-900 duration-500 relative group"
-                        onClick={() =>
-                            showPlayer({
-                                trackUrl: track.track_url,
-                                trackName: track.track_name,
-                                imageUrl: track.image_url,
-                                artistName: track.artist_name,
-                            })
-                        }
-                    >
+                    <div className="flex flex-col justify-center items-center p-4 cursor-pointer rounded-lg hover:bg-zinc-900 duration-500 relative group">
                         <div className="relative">
                             <Avatar
                                 radius="sm"
                                 src={track.image_url}
                                 className="w-40 h-40 hover:scale-105 transition-transform duration-300"
                             />
-                            <div className="absolute bottom-0 -right-4 translate-y-8 opacity-0 group-hover:opacity-100 group-hover:translate-y-4 transition-all duration-500 ease-out">
+                            <div
+                                className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 translate-y-8 opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 ease-out"
+                                onClick={() => showModal(track.track_id)}
+                            >
+                                <AddIcon color="var(--blue-1)" size={32} />
+                            </div>
+
+                            <div
+                                className="absolute inset-0 translate-y-8 flex items-center justify-center opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 ease-out"
+                                onClick={() =>
+                                    showPlayer({
+                                        trackUrl: track.track_url,
+                                        trackName: track.track_name,
+                                        imageUrl: track.image_url,
+                                        artistName: track.artist_name,
+                                    })
+                                }
+                            >
                                 <PlayIcon color="var(--primary)" size={48} />
                             </div>
                         </div>
