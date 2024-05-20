@@ -21,7 +21,8 @@ import {
 } from "@nextui-org/react"
 import { PlayIcon, DeleteIcon, EditIcon } from "@/components/icons"
 import React, { useMemo, useState } from "react"
-import { useMusicPlayer } from "@/components/MusicPlayer/MusicPlayerContext"
+import { useMusicPlayer } from "@/context/MusicPlayerContext"
+import { useAuth } from "@/context/AuthContext"
 
 const test_playlist = [
     {
@@ -192,6 +193,7 @@ const test_playlist = [
 ]
 
 export default function PlaylistPage() {
+    const { isLoggedIn } = useAuth()
     const { isOpen, onOpen, onClose } = useDisclosure()
     const [selectedPlaylist, setSelectedPlaylist] = useState<IPlaylist | null>(
         test_playlist[0]
@@ -200,6 +202,27 @@ export default function PlaylistPage() {
     const openModal = (playlist: IPlaylist) => {
         setSelectedPlaylist(playlist)
         onOpen()
+    }
+
+    if (isLoggedIn === false) {
+        return (
+            <div className="p-4">
+                <h1 className="text-4xl font-bold text-danger-500">
+                    Access Denied
+                </h1>
+                <p className="text-2xl font-semibold text-danger-500">
+                    Please login to access this page
+                </p>
+            </div>
+        )
+    }
+
+    if (isLoggedIn === null) {
+        return (
+            <div className="p-4">
+                <Spinner />
+            </div>
+        )
     }
 
     return (

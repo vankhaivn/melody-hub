@@ -9,7 +9,7 @@ import {
 } from "@nextui-org/react"
 import { AcmeLogo } from "@/components/icons/components/AcmeLogo"
 import { toast } from "react-toastify"
-import { useMusicPlayer } from "@/components/MusicPlayer/MusicPlayerContext"
+import { useMusicPlayer } from "@/context/MusicPlayerContext"
 import { get_all_artists } from "@/api/artists"
 
 export default function Home() {

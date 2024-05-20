@@ -39,6 +39,11 @@ export const login = async (email: string, password: string) => {
 }
 
 export const validateToken = async () => {
+    const token = Cookies.get("token")
+    if (!token) {
+        console.log("Token is not found")
+        return false
+    }
     try {
         const url = `${baseUrl}/account/validate-token`
         const response = await axios.get(url, {
@@ -48,13 +53,14 @@ export const validateToken = async () => {
         })
         if (response.data) {
             console.log("Token is valid")
+            return true
         } else {
             console.log("Token is invalid")
+            return false
         }
-        console.log(response.data)
         return response.data
     } catch (error) {
         console.error("Validate token error:", error)
-        return null
+        return false
     }
 }

@@ -5,7 +5,7 @@ import React, {
     useCallback,
     ReactNode,
 } from "react"
-import MusicPlayer from "./MusicPlayer"
+import MusicPlayer from "@/components/MusicPlayer"
 
 interface MusicPlayerContextType {
     showPlayer: ({

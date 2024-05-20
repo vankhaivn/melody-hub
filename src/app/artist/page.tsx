@@ -19,7 +19,7 @@ import {
     Spinner,
 } from "@nextui-org/react"
 import { PlayIcon } from "@/components/icons"
-import { useMusicPlayer } from "@/components/MusicPlayer/MusicPlayerContext"
+import { useMusicPlayer } from "@/context/MusicPlayerContext"
 import useSWR from "swr"
 import { useState, useMemo } from "react"
 import { formatView, formatDuration } from "@/utils/format"

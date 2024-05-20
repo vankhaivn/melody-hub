@@ -38,6 +38,7 @@ body {
     --blue: #00a8ff;
     --dark-1: #18181b;
     --gray: #27272a;
+    --gray-1: #27272a62;
 }
 
 input:-webkit-autofill {

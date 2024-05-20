@@ -11,7 +11,7 @@ import {
     VolumeHighIcon,
     VolumeLowIcon,
 } from "@/components/icons"
-import { useMusicPlayer } from "@/components/MusicPlayer/MusicPlayerContext"
+import { useMusicPlayer } from "@/context/MusicPlayerContext"
 
 export default function MusicPlayer({
     trackUrl,

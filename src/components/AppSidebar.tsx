@@ -30,7 +30,7 @@ import { registerValidation, loginValidation } from "@/utils/valid"
 import { toast } from "react-toastify"
 
 import { register, login } from "@/api/auth"
-import { isLogin as checkLogin } from "@/utils/auth"
+import { useAuth } from "@/context/AuthContext"
 
 export default function AppSidebar() {
     const currentPath = usePathname()
@@ -40,18 +40,9 @@ export default function AppSidebar() {
         } transition-colors duration-600 cursor-pointer rounded-2xl`
     }
 
-    const logout = () => {
-        Cookies.remove("token")
-        window.location.reload()
-    }
+    const { isLoggedIn, loginContext, logoutContext } = useAuth()
 
     const { isOpen, onOpen, onOpenChange } = useDisclosure()
-
-    const [isLoggedIn, setIsLoggedIn] = useState(false)
-
-    useEffect(() => {
-        setIsLoggedIn(checkLogin())
-    }, [])
 
     return (
         <div className="fixed h-full w-1/6 border-r-small border-divider pt-2 top-0 left-0 flex flex-col justify-between">
@@ -96,10 +87,10 @@ export default function AppSidebar() {
                 </ul>
                 <ul className="px-4 py-4 gap-y-2 flex flex-col">
                     <Divider className="mb-2" />
-                    {isLoggedIn ? (
+                    {isLoggedIn === true ? (
                         <li
                             className="flex items-center py-3 px-4 hover:bg-zinc-800 transition-colors duration-600 cursor-pointer rounded-2xl"
-                            onClick={logout}
+                            onClick={logoutContext}
                         >
                             <LogOutIcon />
                             <p className="text-xl ml-3 font-semibold">
@@ -120,7 +111,7 @@ export default function AppSidebar() {
             <LoginModal
                 isOpen={isOpen}
                 onOpenChange={onOpenChange}
-                setIsLoggedIn={setIsLoggedIn}
+                loginContext={loginContext}
             />
         </div>
     )
@@ -138,11 +129,11 @@ const Logo = () => (
 const LoginModal = ({
     isOpen,
     onOpenChange,
-    setIsLoggedIn,
+    loginContext,
 }: {
     isOpen: any
     onOpenChange: any
-    setIsLoggedIn: any
+    loginContext: any
 }) => {
     const [modalMode, setModalMode] = useState<"login" | "register">("login")
     const [email, setEmail] = useState("")
@@ -182,8 +173,8 @@ const LoginModal = ({
                 const response = await login(email, password)
                 if (response) {
                     toast.success("Login successfully!")
-                    setIsLoggedIn(checkLogin())
                     onOpenChange()
+                    loginContext()
                 }
             } catch (error) {
                 toast.error("Login failed!")
