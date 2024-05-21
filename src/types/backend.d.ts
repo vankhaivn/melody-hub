@@ -14,7 +14,9 @@ interface ITrack {
     release_year: number
     duration: number
     artist_name: string
+    artist_id: string
     genres_name: string
+    genres_id: string
 }
 
 interface IPlaylist {

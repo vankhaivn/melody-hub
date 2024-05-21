@@ -13,6 +13,18 @@ export const get_all_artists = async () => {
     }
 }
 
+export const get_artists_by_id = async (id: string) => {
+    try {
+        const url = `${baseUrl}/artist/get-artist-by-id?artist_id=${id}`
+        const response = await axios.get(url)
+        const artist: IArtist = response.data
+        return artist
+    } catch (error) {
+        console.error("Error fetching artists:", error)
+        return null
+    }
+}
+
 export const get_artists_by_country = async (country: string) => {
     try {
         const url = `${baseUrl}/artist/get-artists-by-country?country=${country}`

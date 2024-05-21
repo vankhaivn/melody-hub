@@ -27,6 +27,7 @@ import { add_track_to_playlist, get_all_playlist } from "@/api/playlist"
 import { toast } from "react-toastify"
 import { useAuth } from "@/context/AuthContext"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 
 export default function DetailTrackPage({
     params,
@@ -34,6 +35,7 @@ export default function DetailTrackPage({
     params: { id: string }
 }) {
     const { isLoggedIn } = useAuth()
+    const { showPlayer } = useMusicPlayer()
     const trackFetcher = () => get_track_by_id(params.id)
     const {
         data: track,
@@ -57,8 +59,6 @@ export default function DetailTrackPage({
         )
     }
 
-    const { showPlayer } = useMusicPlayer()
-
     return (
         <div className="py-8 px-16">
             <div className="flex gap-x-6 bg-content1 p-6 rounded-t-xl">
@@ -71,17 +71,30 @@ export default function DetailTrackPage({
                 />
                 <div className="flex flex-col justify-between">
                     <p className="text-xl font-semibold text-success-500">
-                        Track
+                        Track -{" "}
+                        <span className="font-bold text-medium">
+                            {track?.genres_name}
+                        </span>
                     </p>
                     <h1 className="text-7xl font-bold">{track?.track_name}</h1>
-                    <p className="text-xl font-semibold">
-                        By{" "}
-                        <span className="text-success-500 font-bold">
-                            {track?.artist_name}
-                        </span>{" "}
-                        - {track?.release_year} -{" "}
-                        {formatDuration(track?.duration || 0)}
-                    </p>
+                    <div className="text-xl font-semibold flex gap-x-2">
+                        <div>By</div>
+                        <Tooltip
+                            content="Click to go to this artist page"
+                            size="lg"
+                            color="success"
+                            className="font-bold"
+                        >
+                            <Link
+                                className="text-success-500 font-bold cursor-pointer"
+                                href={`/artist/${track?.artist_id}`}
+                            >
+                                {track?.artist_name}
+                            </Link>
+                        </Tooltip>
+                        <div>- {track?.release_year} -</div>
+                        <div>{formatDuration(track?.duration || 0)}</div>
+                    </div>
                 </div>
             </div>
             <div
@@ -140,7 +153,7 @@ export default function DetailTrackPage({
                 </div>
             </div>
             <div className="mt-4">
-                <RecommendTrack trackId={params.id} />
+                <RecommendTrack trackId={params.id} showPlayer={showPlayer} />
             </div>
         </div>
     )
@@ -229,8 +242,13 @@ const AddTrackToPlaylist = ({ trackId }: { trackId: string }) => {
     )
 }
 
-const RecommendTrack = ({ trackId }: { trackId: string }) => {
-    const { showPlayer } = useMusicPlayer()
+const RecommendTrack = ({
+    trackId,
+    showPlayer,
+}: {
+    trackId: string
+    showPlayer: any
+}) => {
     const router = useRouter()
     const rcmTracksFetcher = () => get_rcm_tracks(trackId)
     const {
@@ -261,7 +279,7 @@ const RecommendTrack = ({ trackId }: { trackId: string }) => {
                 <h3 className="text-2xl font-extrabold">Recommended</h3>
                 <p>Based on the artist, genre of this track</p>
             </div>
-            <Table>
+            <Table aria-label="Recommend">
                 <TableHeader>
                     <TableColumn>NAME</TableColumn>
                     <TableColumn>ARTIST</TableColumn>

@@ -197,8 +197,8 @@ const Playlists = ({
     playlists: IPlaylist[] | undefined
     openModal: (playlist: IPlaylist) => void
 }) => {
-    if (!playlists) {
-        return <div>No playlist found</div>
+    if (!playlists || playlists.length === 0) {
+        return <div className="font-bold text-xl mt-2">No playlist found</div>
     }
     return (
         <div className="flex flex-col gap-y-2 w-3/4">

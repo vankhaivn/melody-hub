@@ -23,6 +23,7 @@ import { useMusicPlayer } from "@/context/MusicPlayerContext"
 import useSWR from "swr"
 import { useState, useMemo } from "react"
 import { formatView, formatDuration } from "@/utils/format"
+import Link from "next/link"
 
 export default function ArtistPage() {
     const artistFetcher = () => get_all_artists()
@@ -267,8 +268,10 @@ const RenderModal = ({
                             <TableHeader>
                                 <TableColumn key="order">#</TableColumn>
                                 <TableColumn key="name">NAME</TableColumn>
-                                <TableColumn key="role">VIEW</TableColumn>
-                                <TableColumn key="role">DURATION</TableColumn>
+                                <TableColumn key="view">VIEW</TableColumn>
+                                <TableColumn key="duration">
+                                    DURATION
+                                </TableColumn>
                                 <TableColumn key="status">
                                     RELEASE YEAR
                                 </TableColumn>
@@ -284,27 +287,23 @@ const RenderModal = ({
                                     <TableRow
                                         key={item.track_name}
                                         className="cursor-pointer"
-                                        onClick={() => {
-                                            showPlayer({
-                                                trackName: item.track_name,
-                                                imageUrl: item.image_url,
-                                                artistName: artist.artist_name,
-                                                trackUrl: item.track_url,
-                                            })
-                                            onClose()
-                                        }}
                                     >
                                         <TableCell className="font-semibold group-hover:text-success-500 transition-colors duration-400">
                                             {item.rowIndex}
                                         </TableCell>
-                                        <TableCell className="flex items-center font-semibold group-hover:text-success-500 transition-colors duration-400">
-                                            <Avatar
-                                                isBordered
-                                                radius="md"
-                                                src={item.image_url}
-                                                className="mr-4"
-                                            />
-                                            {item.track_name}
+                                        <TableCell className="font-semibold group-hover:text-success-500 transition-colors duration-400">
+                                            <Link
+                                                href={`/track/${item.track_id}`}
+                                                className="flex items-center"
+                                            >
+                                                <Avatar
+                                                    isBordered
+                                                    radius="md"
+                                                    src={item.image_url}
+                                                    className="mr-4"
+                                                />
+                                                {item.track_name}
+                                            </Link>
                                         </TableCell>
                                         <TableCell className="font-semibold group-hover:text-success-500 transition-colors duration-400">
                                             {formatView(item.view)}
@@ -315,7 +314,18 @@ const RenderModal = ({
                                         <TableCell className="font-semibold group-hover:text-success-500 transition-colors duration-400">
                                             {item.release_year}
                                         </TableCell>
-                                        <TableCell>
+                                        <TableCell
+                                            onClick={() => {
+                                                showPlayer({
+                                                    trackName: item.track_name,
+                                                    imageUrl: item.image_url,
+                                                    artistName:
+                                                        artist.artist_name,
+                                                    trackUrl: item.track_url,
+                                                })
+                                                onClose()
+                                            }}
+                                        >
                                             <PlayIcon
                                                 color="var(--primary)"
                                                 size={32}

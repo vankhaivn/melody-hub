@@ -34,8 +34,13 @@ import { useAuth } from "@/context/AuthContext"
 export default function AppSidebar() {
     const currentPath = usePathname()
     const getLinkClassName = (path: string) => {
+        if (path === "/") {
+            return `flex items-center py-3 px-4 ${
+                currentPath === path ? "bg-zinc-800" : "hover:bg-zinc-800"
+            } transition-colors duration-600 cursor-pointer rounded-2xl`
+        }
         return `flex items-center py-3 px-4 ${
-            currentPath === path ? "bg-zinc-800" : "hover:bg-zinc-800"
+            currentPath.startsWith(path) ? "bg-zinc-800" : "hover:bg-zinc-800"
         } transition-colors duration-600 cursor-pointer rounded-2xl`
     }
 
