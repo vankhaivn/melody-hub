@@ -1,7 +1,16 @@
 "use client"
 import { formatDuration, formatTrackName, formatView } from "@/utils/format"
-import { Tab, Tabs, Card, CardBody, Button, Divider } from "@nextui-org/react"
 import {
+    Tab,
+    Tabs,
+    Card,
+    CardBody,
+    Button,
+    Divider,
+    Input,
+    Spinner,
+    Avatar,
+    Image,
     Table,
     TableHeader,
     TableColumn,
@@ -9,13 +18,7 @@ import {
     TableRow,
     TableCell,
     Pagination,
-    Spinner,
-    Avatar,
-    Image,
-    Input,
     ScrollShadow,
-} from "@nextui-org/react"
-import {
     Modal,
     ModalContent,
     ModalBody,
@@ -33,6 +36,7 @@ import {
     add_track_to_playlist,
     remove_track_from_playlist,
     delete_playlist,
+    change_playlist_name,
 } from "@/api/playlist"
 import useSWR from "swr"
 import { toast } from "react-toastify"
@@ -170,6 +174,7 @@ const TabList = ({
             </div>
         )
     }
+
     return (
         <Tabs color="success" size="lg">
             <Tab title="All Playlist">
@@ -238,7 +243,9 @@ const PlaylistModal = ({
     mutatePlaylists: () => void
 }) => {
     const [isLoadingDeleteButton, setIsLoadingDeleteButton] = useState(false)
-    const tracksFetcher = () => get_tracks_by_playlist_id(playlist.playlist_id)
+    const [isLoadingEditButton, setIsLoadingEditButton] = useState(false)
+    const [isEditing, setIsEditing] = useState(false)
+    const [playlistName, setPlaylistName] = useState(playlist.playlist_name)
     const {
         data: tracks,
         error: tracksError,
@@ -246,7 +253,7 @@ const PlaylistModal = ({
         mutate: mutateTracks,
     } = useSWR<ITrack[]>(
         `all_tracks_in_${playlist.playlist_id}`,
-        tracksFetcher,
+        () => get_tracks_by_playlist_id(playlist.playlist_id),
         {
             revalidateIfStale: false,
             revalidateOnFocus: false,
@@ -258,8 +265,6 @@ const PlaylistModal = ({
     }
     const countTracks = tracks ? tracks.length : 0
 
-    const tracksRecommendFetcher = () =>
-        get_recommend_tracks_by_playlist_id(playlist.playlist_id)
     const {
         data: tracksRecommend,
         error: tracksRecommendError,
@@ -267,7 +272,7 @@ const PlaylistModal = ({
         mutate: mutateTracksRecommend,
     } = useSWR<ITrack[]>(
         `all_track_recommend_in_${playlist.playlist_id}`,
-        tracksRecommendFetcher,
+        () => get_recommend_tracks_by_playlist_id(playlist.playlist_id),
         {
             revalidateIfStale: false,
             revalidateOnFocus: false,
@@ -300,6 +305,38 @@ const PlaylistModal = ({
         }
     }
 
+    const handleEditPlaylist = async (playlist_name: string) => {
+        if (!playlist_name) {
+            toast.error("Playlist name is required!")
+            return
+        }
+        try {
+            setIsLoadingEditButton(true)
+            const response = await change_playlist_name({
+                playlist_name,
+                playlist_id: playlist.playlist_id,
+            })
+            if (response) {
+                toast.success("Playlist updated successfully!")
+                setIsEditing(false)
+                mutatePlaylists()
+            } else {
+                toast.error("Failed to update playlist!")
+            }
+        } catch (error) {
+            toast.error("Failed to update playlist!")
+        } finally {
+            setIsLoadingEditButton(false)
+            setIsEditing(false)
+        }
+    }
+
+    useEffect(() => {
+        if (playlistName !== playlist.playlist_name) {
+            setPlaylistName(playlist.playlist_name)
+        }
+    }, [playlist.playlist_name])
+
     return (
         <Modal
             backdrop="blur"
@@ -323,9 +360,50 @@ const PlaylistModal = ({
                                     <h3 className="text-xl font-semibold">
                                         Playlist
                                     </h3>
-                                    <h3 className="text-6xl font-semibold">
-                                        {playlist.playlist_name}
-                                    </h3>
+                                    {isEditing ? (
+                                        <div className="flex items-center gap-x-2">
+                                            <Input
+                                                variant="bordered"
+                                                size="lg"
+                                                value={playlistName}
+                                                onChange={(e) =>
+                                                    setPlaylistName(
+                                                        e.target.value
+                                                    )
+                                                }
+                                            />
+                                            <Button
+                                                color="success"
+                                                variant="ghost"
+                                                size="md"
+                                                onClick={() =>
+                                                    handleEditPlaylist(
+                                                        playlistName
+                                                    )
+                                                }
+                                                isLoading={isLoadingEditButton}
+                                            >
+                                                Save
+                                            </Button>
+                                            <Button
+                                                color="danger"
+                                                variant="flat"
+                                                size="md"
+                                                onClick={() => {
+                                                    setIsEditing(false)
+                                                    setPlaylistName(
+                                                        playlist.playlist_name
+                                                    )
+                                                }}
+                                            >
+                                                Cancel
+                                            </Button>
+                                        </div>
+                                    ) : (
+                                        <h3 className="text-6xl font-semibold">
+                                            {playlistName}
+                                        </h3>
+                                    )}
                                     <p className="text-md text-gray-500 font-semibold">
                                         {countTracks} tracks,{" "}
                                         {formatDuration(
@@ -340,11 +418,15 @@ const PlaylistModal = ({
                                     color="var(--primary)"
                                     className="hover:scale-110 transition-transform cursor-pointer"
                                 />
-                                <EditIcon
-                                    size={24}
-                                    color="var(--blue)"
-                                    className="ml-8 mb-1 cursor-pointer hover:scale-125 transition-transform"
-                                />
+                                <Button
+                                    onClick={() => setIsEditing(true)}
+                                    isIconOnly
+                                    variant="light"
+                                    color="primary"
+                                    className="flex justify-center items-center ml-4"
+                                >
+                                    <EditIcon size={20} color="var(--blue)" />
+                                </Button>
                                 <Button
                                     onClick={() =>
                                         handleDeletePlaylist(
@@ -459,9 +541,7 @@ const TracksTable = ({
                     />
                 </div>
             }
-            classNames={{
-                wrapper: "min-h-[222px]",
-            }}
+            classNames={{ wrapper: "min-h-[222px]" }}
         >
             <TableHeader>
                 <TableColumn key="order">#</TableColumn>

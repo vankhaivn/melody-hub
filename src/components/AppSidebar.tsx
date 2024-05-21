@@ -23,7 +23,6 @@ import {
     Divider,
 } from "@nextui-org/react"
 
-import Cookies from "js-cookie"
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { registerValidation, loginValidation } from "@/utils/valid"

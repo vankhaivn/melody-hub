@@ -11,7 +11,7 @@ import { validateToken } from "@/api/auth"
 
 interface AuthContextType {
     isLoggedIn: boolean | null
-    loginContext: (token: string) => void
+    loginContext: () => void
     logoutContext: () => void
 }
 
@@ -38,12 +38,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     const loginContext = () => {
         setIsLoggedIn(true)
+        window.location.reload()
     }
 
     const logoutContext = () => {
         Cookies.remove("token")
         setIsLoggedIn(false)
         toast.success("Logout successfully")
+        window.location.reload()
     }
 
     return (

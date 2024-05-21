@@ -1,14 +1,14 @@
 "use client"
 import { Divider, Avatar, Skeleton, Switch, Tooltip } from "@nextui-org/react"
-import { PlayIcon, ShuffleIcon, AddIcon } from "@/components/icons"
-import { get_shuffle_tracks } from "@/api/tracks"
+import { PlayIcon, ShuffleIcon } from "@/components/icons"
+import { get_shuffle_tracks, get_top_trending_tracks } from "@/api/tracks"
 import { useMusicPlayer } from "@/context/MusicPlayerContext"
 import { formatDuration, formatTrackName, formatView } from "@/utils/format"
 import { useState } from "react"
-import { useAddToPlaylistContext } from "@/context/AddToPlaylistContext"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import useSWR from "swr"
 import { faClock, faEye, faUserPen } from "@fortawesome/free-solid-svg-icons"
+import { useRouter } from "next/navigation"
 
 export default function TrackPage() {
     const [isShuffle, setIsShuffle] = useState(false)
@@ -93,26 +93,7 @@ const ShuffleTracks = () => {
     }
 
     const { showPlayer } = useMusicPlayer()
-    const { showModal } = useAddToPlaylistContext()
-
-    const handleShowModal = (trackId: string, e: React.MouseEvent) => {
-        const rect = (e.target as HTMLElement).getBoundingClientRect()
-        const viewportWidth = window.innerWidth
-        const viewportHeight = window.innerHeight
-
-        let left = rect.left
-        let top = rect.bottom
-
-        if (left + 340 > viewportWidth) {
-            left = viewportWidth - 340
-        }
-
-        if (top + 144 > viewportHeight) {
-            top = viewportHeight - 144
-        }
-
-        showModal(trackId, { x: left, y: top })
-    }
+    const router = useRouter()
 
     return (
         <div className="grid grid-cols-6">
@@ -135,18 +116,12 @@ const ShuffleTracks = () => {
                                 radius="sm"
                                 src={track.image_url}
                                 className="w-40 h-40 hover:scale-105 transition-transform duration-300"
+                                onClick={() =>
+                                    router.push(`/track/${track.track_id}`)
+                                }
                             />
                             <div
-                                className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 translate-y-8 opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 ease-out"
-                                onClick={(e) =>
-                                    handleShowModal(track.track_id, e)
-                                }
-                            >
-                                <AddIcon color="var(--blue-1)" size={32} />
-                            </div>
-
-                            <div
-                                className="absolute inset-0 translate-y-8 flex items-center justify-center opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 ease-out"
+                                className="absolute bottom-0 -right-4 translate-y-8 opacity-0 group-hover:opacity-100 group-hover:translate-y-4 transition-all duration-500 ease-out"
                                 onClick={() =>
                                     showPlayer({
                                         trackUrl: track.track_url,
@@ -178,9 +153,7 @@ const ShuffleTracks = () => {
 }
 
 const PopularTracks = () => {
-    const popularTracksFetcher = () => get_shuffle_tracks(12)
-    const { showModal } = useAddToPlaylistContext()
-
+    const popularTracksFetcher = () => get_top_trending_tracks(12)
     const {
         data: popularTracks,
         error: popularTracksError,
@@ -200,24 +173,7 @@ const PopularTracks = () => {
     }
 
     const { showPlayer } = useMusicPlayer()
-    const handleShowModal = (trackId: string, e: React.MouseEvent) => {
-        const rect = (e.target as HTMLElement).getBoundingClientRect()
-        const viewportWidth = window.innerWidth
-        const viewportHeight = window.innerHeight
-
-        let left = rect.left
-        let top = rect.bottom
-
-        if (left + 340 > viewportWidth) {
-            left = viewportWidth - 340
-        }
-
-        if (top + 144 > viewportHeight) {
-            top = viewportHeight - 144
-        }
-
-        showModal(trackId, { x: left, y: top })
-    }
+    const router = useRouter()
 
     return (
         <div className="grid grid-cols-6">
@@ -240,18 +196,12 @@ const PopularTracks = () => {
                                 radius="sm"
                                 src={track.image_url}
                                 className="w-40 h-40 hover:scale-105 transition-transform duration-300"
+                                onClick={() =>
+                                    router.push(`/track/${track.track_id}`)
+                                }
                             />
                             <div
-                                className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 translate-y-8 opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 ease-out"
-                                onClick={(e) =>
-                                    handleShowModal(track.track_id, e)
-                                }
-                            >
-                                <AddIcon color="var(--blue-1)" size={32} />
-                            </div>
-
-                            <div
-                                className="absolute inset-0 translate-y-8 flex items-center justify-center opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 ease-out"
+                                className="absolute bottom-0 -right-4 translate-y-8 opacity-0 group-hover:opacity-100 group-hover:translate-y-4 transition-all duration-500 ease-out"
                                 onClick={() =>
                                     showPlayer({
                                         trackUrl: track.track_url,

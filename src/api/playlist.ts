@@ -27,7 +27,7 @@ export const create_playlist = async (playlist_name: string) => {
             return false
         }
     } catch (error) {
-        console.error("Validate token error:", error)
+        console.error("Error:", error)
         return false
     }
 }
@@ -57,7 +57,7 @@ export const delete_playlist = async (playlist_id: string) => {
             return false
         }
     } catch (error) {
-        console.error("Validate token error:", error)
+        console.error("Error:", error)
         return false
     }
 }
@@ -88,7 +88,7 @@ export const get_all_playlist = async () => {
             return []
         }
     } catch (error) {
-        console.error("Validate token error:", error)
+        console.error("Error:", error)
         return []
     }
 }
@@ -113,7 +113,7 @@ export const get_tracks_by_playlist_id = async (playlist_id: string) => {
             return []
         }
     } catch (error) {
-        console.error("Validate token error:", error)
+        console.error("Error:", error)
         return []
     }
 }
@@ -140,7 +140,7 @@ export const get_recommend_tracks_by_playlist_id = async (
             return []
         }
     } catch (error) {
-        console.error("Validate token error:", error)
+        console.error("Error:", error)
         return []
     }
 }
@@ -172,13 +172,11 @@ export const add_track_to_playlist = async ({
             }
         )
 
-        if (response.data) {
+        if (response.status == 201) {
             return true
-        } else {
-            return false
         }
     } catch (error) {
-        console.error("Validate token error:", error)
+        console.error("Error:", error)
         return false
     }
 }
@@ -216,7 +214,45 @@ export const remove_track_from_playlist = async ({
             return false
         }
     } catch (error) {
-        console.error("Validate token error:", error)
+        console.error("Error:", error)
+        return false
+    }
+}
+
+export const change_playlist_name = async ({
+    playlist_id,
+    playlist_name,
+}: {
+    playlist_id: string
+    playlist_name: string
+}) => {
+    const token = Cookies.get("token")
+    if (!token) {
+        console.log("Token is not found")
+        return false
+    }
+    try {
+        const url = `${baseUrl}/playlist/change-playlist-name`
+        const response = await axios.post(
+            url,
+            {
+                playlist_id: playlist_id,
+                playlist_name: playlist_name,
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        )
+
+        if (response.data) {
+            return true
+        } else {
+            return false
+        }
+    } catch (error) {
+        console.error("Error:", error)
         return false
     }
 }
