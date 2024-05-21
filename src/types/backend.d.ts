@@ -31,3 +31,11 @@ interface ISmallPlaylist {
     playlist_id: string
     playlist_name: string
 }
+
+interface IAccount {
+    user_id: string
+    email: string
+    role: string
+    fullname: string
+    avatar: string
+}
