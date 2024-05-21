@@ -170,12 +170,7 @@ export default function DetailArtistPage({
                                     </TableCell>
                                     <TableCell
                                         onClick={() => {
-                                            showPlayer({
-                                                trackName: item.track_name,
-                                                imageUrl: item.image_url,
-                                                artistName: artist.artist_name,
-                                                trackUrl: item.track_url,
-                                            })
+                                            showPlayer([item])
                                         }}
                                     >
                                         <PlayIcon

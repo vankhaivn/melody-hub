@@ -59,6 +59,11 @@ export default function DetailTrackPage({
         )
     }
 
+    const handlePlay = (track: ITrack) => {
+        const trackData = { ...track }
+        showPlayer([trackData])
+    }
+
     return (
         <div className="py-8 px-16">
             <div className="flex gap-x-6 bg-content1 p-6 rounded-t-xl">
@@ -103,22 +108,14 @@ export default function DetailTrackPage({
                     backgroundColor: "var(--gray-1)",
                 }}
             >
-                <div
-                    onClick={() => {
-                        showPlayer({
-                            trackName: track?.track_name || "",
-                            artistName: track?.artist_name || "",
-                            imageUrl: track?.image_url || "",
-                            trackUrl: track?.track_url || "",
-                        })
-                    }}
-                >
+                <div onClick={() => track && handlePlay(track)}>
                     <PlayIcon
                         size={80}
                         color="var(--primary)"
                         className="hover:scale-110 transition-transform duration-300 cursor-pointer"
                     />
                 </div>
+
                 <div>
                     <Popover placement="right-end" showArrow={true} size="lg">
                         <PopoverTrigger>
@@ -153,7 +150,7 @@ export default function DetailTrackPage({
                 </div>
             </div>
             <div className="mt-4">
-                <RecommendTrack trackId={params.id} showPlayer={showPlayer} />
+                <RecommendTrack trackId={params.id} handlePlay={handlePlay} />
             </div>
         </div>
     )
@@ -168,7 +165,6 @@ const AddTrackToPlaylist = ({ trackId }: { trackId: string }) => {
         data: playlists,
         error: playlistsError,
         isValidating: playlistsValidating,
-        mutate: mutatePlaylists,
     } = useSWR<IPlaylist[]>("all_playlists", playlistsFetcher, {
         revalidateIfStale: false,
         revalidateOnFocus: false,
@@ -244,10 +240,10 @@ const AddTrackToPlaylist = ({ trackId }: { trackId: string }) => {
 
 const RecommendTrack = ({
     trackId,
-    showPlayer,
+    handlePlay,
 }: {
     trackId: string
-    showPlayer: any
+    handlePlay: (track: ITrack) => void
 }) => {
     const router = useRouter()
     const rcmTracksFetcher = () => get_rcm_tracks(trackId)
@@ -255,12 +251,12 @@ const RecommendTrack = ({
         data: rcmTracks,
         error: rcmTracksError,
         isValidating: rcmTracksValidating,
-        mutate: mutateRcmTracks,
     } = useSWR<ITrack[]>(`rcmTrack_${trackId}`, rcmTracksFetcher, {
         revalidateIfStale: false,
         revalidateOnFocus: false,
         revalidateOnReconnect: false,
     })
+
     if (rcmTracksValidating) {
         return (
             <div className="p-4">
@@ -319,14 +315,7 @@ const RecommendTrack = ({
                             <TableCell>
                                 <div
                                     className="hover:scale-125 duration-300 transition-transform flex items-center justify-center"
-                                    onClick={() => {
-                                        showPlayer({
-                                            trackName: track.track_name,
-                                            artistName: track.artist_name,
-                                            imageUrl: track.image_url,
-                                            trackUrl: track.track_url,
-                                        })
-                                    }}
+                                    onClick={() => handlePlay(track)}
                                 >
                                     <PlayIcon
                                         color="var(--primary)"

@@ -8,23 +8,13 @@ import React, {
 import MusicPlayer from "@/components/MusicPlayer"
 
 interface MusicPlayerContextType {
-    showPlayer: ({
-        trackUrl,
-        trackName,
-        imageUrl,
-        artistName,
-    }: {
-        trackUrl: string
-        trackName: string
-        imageUrl: string
-        artistName: string
-    }) => void
+    showPlayer: (tracks: ITrack[]) => void
     hidePlayer: () => void
-    trackUrl: string
-    trackName: string
-    imageUrl: string
-    artistName: string
+    currentTrack: ITrack
     isVisible: boolean
+    nextTrack: () => void
+    prevTrack: () => void
+    setCurrentTrackById: (id: string) => void
 }
 
 const MusicPlayerContext = createContext<MusicPlayerContextType | null>(null)
@@ -45,61 +35,57 @@ interface MusicPlayerProviderProps {
 
 export const MusicPlayerProvider = ({ children }: MusicPlayerProviderProps) => {
     const [isVisible, setIsVisible] = useState(false)
-    const [trackUrl, setTrackUrl] = useState("")
-    const [trackName, setTrackName] = useState("")
-    const [imageUrl, setImageUrl] = useState("")
-    const [artistName, setArtistName] = useState("")
+    const [tracks, setTracks] = useState<ITrack[]>([])
+    const [currentTrackIndex, setCurrentTrackIndex] = useState(0)
 
-    const showPlayer = useCallback(
-        ({
-            trackUrl,
-            trackName,
-            imageUrl,
-            artistName,
-        }: {
-            trackUrl: string
-            trackName: string
-            imageUrl: string
-            artistName: string
-        }) => {
-            setTrackUrl(trackUrl)
-            setTrackName(trackName)
-            setImageUrl(imageUrl)
-            setArtistName(artistName)
-            setIsVisible(true)
-        },
-        []
-    )
+    const showPlayer = useCallback((tracks: ITrack[]) => {
+        setTracks(tracks)
+        setCurrentTrackIndex(0)
+        setIsVisible(true)
+    }, [])
 
     const hidePlayer = useCallback(() => {
         setIsVisible(false)
-        setTrackUrl("")
-        setTrackName("")
-        setImageUrl("")
-        setArtistName("")
+        setTracks([])
+        setCurrentTrackIndex(0)
     }, [])
+
+    const nextTrack = useCallback(() => {
+        setCurrentTrackIndex((prevIndex) =>
+            prevIndex < tracks.length - 1 ? prevIndex + 1 : 0
+        )
+    }, [tracks.length])
+
+    const prevTrack = useCallback(() => {
+        setCurrentTrackIndex((prevIndex) =>
+            prevIndex > 0 ? prevIndex - 1 : tracks.length - 1
+        )
+    }, [tracks.length])
+
+    const setCurrentTrackById = useCallback(
+        (id: string) => {
+            const index = tracks.findIndex((track) => track.track_id === id)
+            if (index !== -1) {
+                setCurrentTrackIndex(index)
+            }
+        },
+        [tracks]
+    )
 
     const value = {
         showPlayer,
         hidePlayer,
-        trackUrl,
-        trackName,
-        imageUrl,
-        artistName,
+        currentTrack: tracks[currentTrackIndex],
         isVisible,
+        nextTrack,
+        prevTrack,
+        setCurrentTrackById,
     }
 
     return (
         <MusicPlayerContext.Provider value={value}>
             {children}
-            {
-                <MusicPlayer
-                    trackUrl={trackUrl}
-                    artistName={artistName}
-                    imageUrl={imageUrl}
-                    trackName={trackName}
-                />
-            }
+            {isVisible && <MusicPlayer tracks={tracks} />}
         </MusicPlayerContext.Provider>
     )
 }

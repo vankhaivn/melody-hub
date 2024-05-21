@@ -5,31 +5,31 @@ import {
     PauseCircleIcon,
     NextIcon,
     PreviousIcon,
-    RepeatOneIcon,
-    ShuffleIcon,
     PlayIcon,
     VolumeHighIcon,
     VolumeLowIcon,
 } from "@/components/icons"
+import { Select, SelectItem } from "@nextui-org/react"
 import { useMusicPlayer } from "@/context/MusicPlayerContext"
 
-export default function MusicPlayer({
-    trackUrl,
-    trackName,
-    imageUrl,
-    artistName,
-}: {
-    trackUrl: string
-    trackName: string
-    imageUrl: string
-    artistName: string
-}) {
-    const { hidePlayer, isVisible } = useMusicPlayer()
+export default function MusicPlayer({ tracks }: { tracks: ITrack[] }) {
+    const {
+        hidePlayer,
+        isVisible,
+        currentTrack,
+        nextTrack,
+        prevTrack,
+        setCurrentTrackById,
+    } = useMusicPlayer()
+
     const [currentTime, setCurrentTime] = useState(0)
     const [duration, setDuration] = useState(0)
     const [isPlaying, setIsPlaying] = useState(true)
     const audioRef = useRef<HTMLAudioElement>(null)
     const [value, setValue] = useState(75)
+    const [selectedTrackId, setSelectedTrackId] = useState(
+        new Set([currentTrack.track_id])
+    )
 
     const handleVolumeChange = (value: number | number[]) => {
         const newValue = Array.isArray(value) ? value[0] : value
@@ -55,6 +55,7 @@ export default function MusicPlayer({
             setCurrentTime(audioRef.current.currentTime)
         }
     }
+
     useEffect(() => {
         if (audioRef.current) {
             audioRef.current.volume = value / 100
@@ -79,15 +80,31 @@ export default function MusicPlayer({
                 setCurrentTime(audio.currentTime)
             }
 
+            const handleEnded = () => {
+                nextTrack()
+            }
+
             audio.addEventListener("loadeddata", setAudioData)
             audio.addEventListener("timeupdate", updateAudioTime)
+            audio.addEventListener("ended", handleEnded)
 
             return () => {
                 audio.removeEventListener("loadeddata", setAudioData)
                 audio.removeEventListener("timeupdate", updateAudioTime)
+                audio.removeEventListener("ended", handleEnded)
             }
         }
-    }, [isPlaying])
+    }, [isPlaying, nextTrack])
+
+    useEffect(() => {
+        setSelectedTrackId(new Set([currentTrack.track_id]))
+    }, [currentTrack.track_id])
+
+    const handleTrackChange = (selectedKeys: Set<string>) => {
+        const selectedTrackId = Array.from(selectedKeys)[0]
+        setCurrentTrackById(selectedTrackId)
+        setSelectedTrackId(selectedKeys)
+    }
 
     return (
         <Card
@@ -108,22 +125,30 @@ export default function MusicPlayer({
                 onChange={handleTimeChange}
                 size="sm"
             />
-            <div className="px-8 grid grid-cols-3 items-center">
-                <div className="flex items-center">
+            <div className="px-8 grid grid-cols-8 items-center">
+                <div className="flex items-center col-span-2">
                     <Image
                         alt="Album cover"
                         className="object-cover"
                         shadow="md"
-                        src={imageUrl}
+                        src={currentTrack.image_url}
                         height="52px"
                         width="52px"
                     />
                     <p className="ml-4 font-bold">
-                        {trackName} <span className="text-success">by</span>{" "}
-                        {artistName}
+                        {currentTrack.track_name}{" "}
+                        <span className="text-success">by</span>{" "}
+                        {currentTrack.artist_name}
                     </p>
                 </div>
-                <div className="flex justify-between ml-12 items-center">
+                <div className="col-span-1">
+                    <SelectPlaylist
+                        tracks={tracks}
+                        setCurrentTrackById={setCurrentTrackById}
+                        currentTrack={currentTrack}
+                    />
+                </div>
+                <div className="flex justify-between ml-12 items-center col-span-2">
                     <p className="text-small">
                         {new Date(currentTime * 1000)
                             .toISOString()
@@ -135,14 +160,7 @@ export default function MusicPlayer({
                             className="data-[hover]:bg-foreground/10"
                             radius="full"
                             variant="light"
-                        >
-                            <RepeatOneIcon className="text-foreground/80" />
-                        </Button>
-                        <Button
-                            isIconOnly
-                            className="data-[hover]:bg-foreground/10"
-                            radius="full"
-                            variant="light"
+                            onPress={prevTrack}
                         >
                             <PreviousIcon />
                         </Button>
@@ -164,24 +182,18 @@ export default function MusicPlayer({
                             className="data-[hover]:bg-foreground/10"
                             radius="full"
                             variant="light"
+                            onPress={nextTrack}
                         >
                             <NextIcon />
                         </Button>
-                        <Button
-                            isIconOnly
-                            className="data-[hover]:bg-foreground/10"
-                            radius="full"
-                            variant="light"
-                        >
-                            <ShuffleIcon className="text-foreground/80" />
-                        </Button>
-                        <audio ref={audioRef} src={trackUrl} />
+
+                        <audio ref={audioRef} src={currentTrack.track_url} />
                     </div>
                     <p className="text-small text-foreground/50">
                         {new Date(duration * 1000).toISOString().substr(14, 5)}
                     </p>
                 </div>
-                <div className="flex gap-2 items-start justify-center pl-12">
+                <div className="flex gap-2 items-start justify-center pl-4 col-span-3 ml-8">
                     <Slider
                         aria-label="Volume"
                         size="md"
@@ -216,16 +228,48 @@ export default function MusicPlayer({
                                 <VolumeHighIcon size={24} />
                             </Button>
                         }
-                        className="max-w-md"
                     />
-                    <div
+                    <Button
+                        variant="flat"
+                        color="danger"
+                        className="font-bold ml-4"
                         onClick={hidePlayer}
-                        className="text-danger-500 text-2xl font-bold cursor-pointer hover:text-danger-300 transition-colors duration-300 mt-1 ml-4"
                     >
-                        X
-                    </div>
+                        Close
+                    </Button>
                 </div>
             </div>
         </Card>
+    )
+}
+
+const SelectPlaylist = ({
+    tracks,
+    setCurrentTrackById,
+    currentTrack,
+}: {
+    tracks: ITrack[]
+    setCurrentTrackById: (id: string) => void
+    currentTrack: ITrack
+}) => {
+    const handleSelectionChange = (e: any) => {
+        setCurrentTrackById(e.target.value)
+    }
+
+    return (
+        <div className="w-50">
+            <Select
+                label="Playing"
+                className="max-w-xs"
+                selectedKeys={new Set([currentTrack.track_id])}
+                onChange={handleSelectionChange}
+            >
+                {tracks.map((track) => (
+                    <SelectItem key={track.track_id} value={track.track_id}>
+                        {track.track_name}
+                    </SelectItem>
+                ))}
+            </Select>
+        </div>
     )
 }

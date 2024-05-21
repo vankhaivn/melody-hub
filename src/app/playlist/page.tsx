@@ -243,6 +243,7 @@ const PlaylistModal = ({
     mutatePlaylists: () => void
 }) => {
     const [isLoadingDeleteButton, setIsLoadingDeleteButton] = useState(false)
+    const { showPlayer } = useMusicPlayer()
     const [isLoadingEditButton, setIsLoadingEditButton] = useState(false)
     const [isEditing, setIsEditing] = useState(false)
     const [playlistName, setPlaylistName] = useState(playlist.playlist_name)
@@ -413,11 +414,19 @@ const PlaylistModal = ({
                                 </div>
                             </div>
                             <div className="flex items-center">
-                                <PlayIcon
-                                    size={64}
-                                    color="var(--primary)"
-                                    className="hover:scale-110 transition-transform cursor-pointer"
-                                />
+                                <div
+                                    onClick={() => {
+                                        if (tracks) {
+                                            showPlayer(tracks)
+                                        }
+                                    }}
+                                >
+                                    <PlayIcon
+                                        size={64}
+                                        color="var(--primary)"
+                                        className="hover:scale-110 transition-transform cursor-pointer"
+                                    />
+                                </div>
                                 <Button
                                     onClick={() => setIsEditing(true)}
                                     isIconOnly
@@ -454,6 +463,7 @@ const PlaylistModal = ({
                                 tracksValidating={tracksValidating}
                                 mutateTracks={mutateTracks}
                                 playlistId={playlist.playlist_id}
+                                showPlayer={showPlayer}
                             />
                             <RecommendPlaylist
                                 tracksRecommend={tracksRecommend}
@@ -478,14 +488,15 @@ const TracksTable = ({
     tracksValidating,
     mutateTracks,
     playlistId,
+    showPlayer,
 }: {
     tracks: ITrack[] | [] | undefined
     onClose: any
     tracksValidating: boolean
     mutateTracks: () => void
     playlistId: string
+    showPlayer: (tracks: ITrack[]) => void
 }) => {
-    const { showPlayer } = useMusicPlayer()
     const [page, setPage] = useState(1)
     const [loadingTrackId, setLoadingTrackId] = useState<string | null>(null)
     const rowsPerPage = 4
@@ -597,12 +608,7 @@ const TracksTable = ({
                         <TableCell className="flex items-center">
                             <div
                                 onClick={() => {
-                                    showPlayer({
-                                        trackName: item.track_name,
-                                        imageUrl: item.image_url,
-                                        artistName: item.artist_name,
-                                        trackUrl: item.track_url,
-                                    })
+                                    showPlayer([item])
                                     onClose()
                                 }}
                             >

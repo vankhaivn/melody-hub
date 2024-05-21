@@ -122,14 +122,7 @@ const ShuffleTracks = () => {
                             />
                             <div
                                 className="absolute bottom-0 -right-4 translate-y-8 opacity-0 group-hover:opacity-100 group-hover:translate-y-4 transition-all duration-500 ease-out"
-                                onClick={() =>
-                                    showPlayer({
-                                        trackUrl: track.track_url,
-                                        trackName: track.track_name,
-                                        imageUrl: track.image_url,
-                                        artistName: track.artist_name,
-                                    })
-                                }
+                                onClick={() => showPlayer([track])}
                             >
                                 <PlayIcon color="var(--primary)" size={48} />
                             </div>
@@ -202,14 +195,7 @@ const PopularTracks = () => {
                             />
                             <div
                                 className="absolute bottom-0 -right-4 translate-y-8 opacity-0 group-hover:opacity-100 group-hover:translate-y-4 transition-all duration-500 ease-out"
-                                onClick={() =>
-                                    showPlayer({
-                                        trackUrl: track.track_url,
-                                        trackName: track.track_name,
-                                        imageUrl: track.image_url,
-                                        artistName: track.artist_name,
-                                    })
-                                }
+                                onClick={() => showPlayer([track])}
                             >
                                 <PlayIcon color="var(--primary)" size={48} />
                             </div>

@@ -23,7 +23,6 @@ import { useMusicPlayer } from "@/context/MusicPlayerContext"
 import useSWR from "swr"
 import { useState, useMemo } from "react"
 import { formatView, formatDuration } from "@/utils/format"
-import Link from "next/link"
 
 export default function ArtistPage() {
     const artistFetcher = () => get_all_artists()
@@ -272,7 +271,7 @@ const RenderModal = ({
                                 <TableColumn key="duration">
                                     DURATION
                                 </TableColumn>
-                                <TableColumn key="status">
+                                <TableColumn key="year">
                                     RELEASE YEAR
                                 </TableColumn>
                                 <TableColumn key="action"> </TableColumn>
@@ -291,19 +290,14 @@ const RenderModal = ({
                                         <TableCell className="font-semibold group-hover:text-success-500 transition-colors duration-400">
                                             {item.rowIndex}
                                         </TableCell>
-                                        <TableCell className="font-semibold group-hover:text-success-500 transition-colors duration-400">
-                                            <Link
-                                                href={`/track/${item.track_id}`}
-                                                className="flex items-center"
-                                            >
-                                                <Avatar
-                                                    isBordered
-                                                    radius="md"
-                                                    src={item.image_url}
-                                                    className="mr-4"
-                                                />
-                                                {item.track_name}
-                                            </Link>
+                                        <TableCell className="flex items-center font-semibold group-hover:text-success-500 transition-colors duration-400">
+                                            <Avatar
+                                                isBordered
+                                                radius="md"
+                                                src={item.image_url}
+                                                className="mr-4"
+                                            />
+                                            {item.track_name}
                                         </TableCell>
                                         <TableCell className="font-semibold group-hover:text-success-500 transition-colors duration-400">
                                             {formatView(item.view)}
@@ -316,13 +310,7 @@ const RenderModal = ({
                                         </TableCell>
                                         <TableCell
                                             onClick={() => {
-                                                showPlayer({
-                                                    trackName: item.track_name,
-                                                    imageUrl: item.image_url,
-                                                    artistName:
-                                                        artist.artist_name,
-                                                    trackUrl: item.track_url,
-                                                })
+                                                showPlayer([item])
                                                 onClose()
                                             }}
                                         >

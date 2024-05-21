@@ -5,7 +5,6 @@ import {
     NavbarBrand,
     NavbarContent,
     NavbarItem,
-    Link,
     Input,
     DropdownItem,
     DropdownTrigger,
@@ -13,6 +12,7 @@ import {
     DropdownMenu,
     Avatar,
 } from "@nextui-org/react"
+import Link from "next/link"
 
 import { SearchIcon } from "@/components/icons"
 
@@ -89,7 +89,9 @@ export default function AppHeader() {
                             <p className="font-semibold">Signed in as</p>
                             <p className="font-semibold">zoey@example.com</p>
                         </DropdownItem>
-                        <DropdownItem key="settings">My Profile</DropdownItem>
+                        <DropdownItem key="settings">
+                            <Link href="/profile">My Profile</Link>
+                        </DropdownItem>
                         <DropdownItem key="team_settings">
                             Team Settings
                         </DropdownItem>
