@@ -12,6 +12,7 @@ import {
     Spinner,
     Avatar,
     Image,
+    Input,
     ScrollShadow,
 } from "@nextui-org/react"
 import {
@@ -29,8 +30,12 @@ import {
     get_all_playlist,
     get_tracks_by_playlist_id,
     get_recommend_tracks_by_playlist_id,
+    add_track_to_playlist,
+    remove_track_from_playlist,
+    delete_playlist,
 } from "@/api/playlist"
 import useSWR from "swr"
+import { toast } from "react-toastify"
 
 export default function PlaylistPage() {
     const { isLoggedIn } = useAuth()
@@ -38,6 +43,20 @@ export default function PlaylistPage() {
     const [selectedPlaylist, setSelectedPlaylist] = useState<IPlaylist | null>(
         null
     )
+    const [playlist_name, setPlaylistName] = useState("")
+    const [isLoadingAddButton, setIsLoadingAddButton] = useState(false)
+
+    const playlistsFetcher = () => get_all_playlist()
+    const {
+        data: playlists,
+        error: playlistsError,
+        isValidating: playlistsValidating,
+        mutate: mutatePlaylists,
+    } = useSWR<IPlaylist[]>("all_playlists", playlistsFetcher, {
+        revalidateIfStale: false,
+        revalidateOnFocus: false,
+        revalidateOnReconnect: false,
+    })
 
     const openModal = (playlist: IPlaylist) => {
         setSelectedPlaylist(playlist)
@@ -65,16 +84,61 @@ export default function PlaylistPage() {
         )
     }
 
+    const handleCreatePlaylist = async () => {
+        if (!playlist_name) {
+            return
+        }
+        try {
+            setIsLoadingAddButton(true)
+            const response = await create_playlist(playlist_name)
+            if (response) {
+                toast.success("Playlist created successfully")
+                setPlaylistName("")
+                mutatePlaylists() // Revalidate playlists
+            } else {
+                toast.error("Failed to create playlist")
+            }
+        } catch (error) {
+            toast.error("Failed to create playlist")
+        } finally {
+            setIsLoadingAddButton(false)
+        }
+    }
+
     return (
-        <div className="p-4">
-            <TabList openModal={openModal} />
-            {selectedPlaylist && (
-                <PlaylistModal
-                    playlist={selectedPlaylist}
-                    isOpen={isOpen}
-                    onClose={onClose}
+        <div className="p-4 flex w-full">
+            <div className="w-1/2">
+                <TabList openModal={openModal} />
+                {selectedPlaylist && (
+                    <PlaylistModal
+                        playlist={selectedPlaylist}
+                        isOpen={isOpen}
+                        onClose={onClose}
+                        mutatePlaylists={mutatePlaylists}
+                    />
+                )}
+            </div>
+            <div className="w-1/2 pr-12">
+                <div className="text-3xl font-bold">Add new playlist</div>
+                <Input
+                    variant="bordered"
+                    label="Playlist name"
+                    className="mt-4 text-xl"
+                    size="lg"
+                    value={playlist_name}
+                    onChange={(e) => setPlaylistName(e.target.value)}
                 />
-            )}
+                <Button
+                    color="success"
+                    variant="ghost"
+                    size="lg"
+                    className="mt-4 float-end"
+                    onClick={handleCreatePlaylist}
+                    isLoading={isLoadingAddButton}
+                >
+                    Add
+                </Button>
+            </div>
         </div>
     )
 }
@@ -132,7 +196,7 @@ const Playlists = ({
         return <div>No playlist found</div>
     }
     return (
-        <div className="flex flex-col gap-y-2 w-1/2">
+        <div className="flex flex-col gap-y-2 w-3/4">
             {playlists.map((playlist) => (
                 <Card
                     key={playlist.playlist_id}
@@ -166,16 +230,20 @@ const PlaylistModal = ({
     playlist,
     isOpen,
     onClose,
+    mutatePlaylists,
 }: {
     playlist: IPlaylist
     isOpen: any
     onClose: any
+    mutatePlaylists: () => void
 }) => {
+    const [isLoadingDeleteButton, setIsLoadingDeleteButton] = useState(false)
     const tracksFetcher = () => get_tracks_by_playlist_id(playlist.playlist_id)
     const {
         data: tracks,
         error: tracksError,
         isValidating: tracksValidating,
+        mutate: mutateTracks,
     } = useSWR<ITrack[]>(
         `all_tracks_in_${playlist.playlist_id}`,
         tracksFetcher,
@@ -196,6 +264,7 @@ const PlaylistModal = ({
         data: tracksRecommend,
         error: tracksRecommendError,
         isValidating: tracksRecommendValidating,
+        mutate: mutateTracksRecommend,
     } = useSWR<ITrack[]>(
         `all_track_recommend_in_${playlist.playlist_id}`,
         tracksRecommendFetcher,
@@ -209,6 +278,28 @@ const PlaylistModal = ({
         return <div>Error loading data</div>
     }
     const countTracksRecommend = tracksRecommend ? tracksRecommend.length : 0
+
+    const handleDeletePlaylist = async (playlist_id: string) => {
+        if (!window.confirm("Are you sure you want to delete this playlist?")) {
+            return
+        }
+        try {
+            setIsLoadingDeleteButton(true)
+            const response = await delete_playlist(playlist_id)
+            if (response) {
+                toast.success("Playlist deleted successfully")
+                onClose()
+                mutatePlaylists() // Revalidate playlists
+            } else {
+                toast.error("Failed to delete playlist")
+            }
+        } catch (error) {
+            toast.error("Failed to delete playlist")
+        } finally {
+            setIsLoadingDeleteButton(false)
+        }
+    }
+
     return (
         <Modal
             backdrop="blur"
@@ -254,11 +345,23 @@ const PlaylistModal = ({
                                     color="var(--blue)"
                                     className="ml-8 mb-1 cursor-pointer hover:scale-125 transition-transform"
                                 />
-                                <DeleteIcon
-                                    size={24}
-                                    color="var(--danger)"
-                                    className="ml-8 mb-1 cursor-pointer hover:scale-125 transition-transform"
-                                />
+                                <Button
+                                    onClick={() =>
+                                        handleDeletePlaylist(
+                                            playlist.playlist_id
+                                        )
+                                    }
+                                    isIconOnly
+                                    isLoading={isLoadingDeleteButton}
+                                    variant="light"
+                                    color="danger"
+                                    className="flex justify-center items-center ml-4"
+                                >
+                                    <DeleteIcon
+                                        size={20}
+                                        color="var(--danger)"
+                                    />
+                                </Button>
                             </div>
                         </div>
                         <Divider />
@@ -267,12 +370,17 @@ const PlaylistModal = ({
                                 tracks={tracks}
                                 onClose={onClose}
                                 tracksValidating={tracksValidating}
+                                mutateTracks={mutateTracks}
+                                playlistId={playlist.playlist_id}
                             />
                             <RecommendPlaylist
                                 tracksRecommend={tracksRecommend}
                                 tracksRecommendValidating={
                                     tracksRecommendValidating
                                 }
+                                playlistId={playlist.playlist_id}
+                                mutateTracks={mutateTracks}
+                                mutateTracksRecommend={mutateTracksRecommend}
                             />
                         </div>
                     </ModalBody>
@@ -286,13 +394,18 @@ const TracksTable = ({
     tracks,
     onClose,
     tracksValidating,
+    mutateTracks,
+    playlistId,
 }: {
     tracks: ITrack[] | [] | undefined
     onClose: any
     tracksValidating: boolean
+    mutateTracks: () => void
+    playlistId: string
 }) => {
     const { showPlayer } = useMusicPlayer()
     const [page, setPage] = useState(1)
+    const [loadingTrackId, setLoadingTrackId] = useState<string | null>(null)
     const rowsPerPage = 4
     const pages = tracks ? Math.ceil(tracks.length / rowsPerPage) : 0
 
@@ -309,6 +422,26 @@ const TracksTable = ({
         }
         return []
     }, [page, tracks])
+
+    const deleteTrack = async (trackId: string) => {
+        setLoadingTrackId(trackId)
+        try {
+            const response = await remove_track_from_playlist({
+                playlist_id: playlistId,
+                track_id: trackId,
+            })
+            if (response) {
+                toast.success("Track deleted successfully")
+                mutateTracks()
+            } else {
+                toast.error("Failed to delete track")
+            }
+        } catch (error) {
+            toast.error("Failed to delete track")
+        } finally {
+            setLoadingTrackId(null)
+        }
+    }
 
     return (
         <Table
@@ -333,9 +466,9 @@ const TracksTable = ({
             <TableHeader>
                 <TableColumn key="order">#</TableColumn>
                 <TableColumn key="name">NAME</TableColumn>
-                <TableColumn key="role">VIEW</TableColumn>
-                <TableColumn key="role">DURATION</TableColumn>
-                <TableColumn key="status">GENRES</TableColumn>
+                <TableColumn key="view">VIEW</TableColumn>
+                <TableColumn key="duration">DURATION</TableColumn>
+                <TableColumn key="genres">GENRES</TableColumn>
                 <TableColumn key="action"> </TableColumn>
             </TableHeader>
 
@@ -347,7 +480,7 @@ const TracksTable = ({
             >
                 {(item) => (
                     <TableRow
-                        key={item.track_name}
+                        key={item.track_id}
                         className="cursor-pointer hover:bg-zinc-800 transition-colors"
                     >
                         <TableCell className="font-semibold group-hover:text-success-500 transition-colors duration-400">
@@ -399,11 +532,20 @@ const TracksTable = ({
                                     className="mb-1 group-hover:scale-125 transition-transform duration-400 cursor-pointer"
                                 />
                             </div>
-                            <DeleteIcon
-                                size={16}
-                                color="var(--danger)"
-                                className="ml-8 mb-1 group-hover:scale-125 transition-transform duration-400 cursor-pointer"
-                            />
+                            <Button
+                                color="danger"
+                                onClick={() => deleteTrack(item.track_id)}
+                                isIconOnly
+                                variant="light"
+                                className="ml-4 flex items-center justify-center"
+                                isLoading={loadingTrackId === item.track_id}
+                            >
+                                <DeleteIcon
+                                    size={16}
+                                    color="var(--danger)"
+                                    className="mb-1"
+                                />
+                            </Button>
                         </TableCell>
                     </TableRow>
                 )}
@@ -415,11 +557,39 @@ const TracksTable = ({
 const RecommendPlaylist = ({
     tracksRecommend,
     tracksRecommendValidating,
+    playlistId,
+    mutateTracks,
+    mutateTracksRecommend,
 }: {
     tracksRecommend: ITrack[] | undefined
     tracksRecommendValidating: boolean
+    playlistId: string
+    mutateTracks: () => void
+    mutateTracksRecommend: () => void
 }) => {
     const loadingState = tracksRecommendValidating ? "loading" : "idle"
+    const [loadingTrackId, setLoadingTrackId] = useState<string | null>(null)
+
+    const addTrackToPlaylist = async (trackId: string) => {
+        setLoadingTrackId(trackId)
+        try {
+            const response = await add_track_to_playlist({
+                playlist_id: playlistId,
+                track_id: trackId,
+            })
+            if (response) {
+                toast.success("Track added to playlist")
+                mutateTracks()
+                mutateTracksRecommend()
+            } else {
+                toast.error("Failed to add track to playlist")
+            }
+        } catch (error) {
+            toast.error("Failed to add track to playlist")
+        } finally {
+            setLoadingTrackId(null)
+        }
+    }
 
     return (
         <div className="mt-12 pb-4">
@@ -430,10 +600,10 @@ const RecommendPlaylist = ({
             <Table aria-label="Example static collection table">
                 <TableHeader>
                     <TableColumn key="name">NAME</TableColumn>
-                    <TableColumn key="role">VIEW</TableColumn>
-                    <TableColumn key="role">DURATION</TableColumn>
-                    <TableColumn key="status">GENRES</TableColumn>
-                    <TableColumn key="status">{""}</TableColumn>
+                    <TableColumn key="view">VIEW</TableColumn>
+                    <TableColumn key="duration">DURATION</TableColumn>
+                    <TableColumn key="genres">GENRES</TableColumn>
+                    <TableColumn key="none">{""}</TableColumn>
                 </TableHeader>
                 <TableBody
                     loadingContent={<Spinner />}
@@ -479,6 +649,12 @@ const RecommendPlaylist = ({
                                           variant="flat"
                                           color="success"
                                           className="font-semibold"
+                                          onClick={() =>
+                                              addTrackToPlaylist(track.track_id)
+                                          }
+                                          isLoading={
+                                              loadingTrackId === track.track_id
+                                          }
                                       >
                                           Add
                                       </Button>
@@ -493,6 +669,10 @@ const RecommendPlaylist = ({
                 variant="light"
                 color="primary"
                 size="lg"
+                onClick={() => {
+                    mutateTracks()
+                    mutateTracksRecommend()
+                }}
             >
                 Refresh
             </Button>

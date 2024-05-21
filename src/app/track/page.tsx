@@ -93,6 +93,26 @@ const ShuffleTracks = () => {
     }
 
     const { showPlayer } = useMusicPlayer()
+    const { showModal } = useAddToPlaylistContext()
+
+    const handleShowModal = (trackId: string, e: React.MouseEvent) => {
+        const rect = (e.target as HTMLElement).getBoundingClientRect()
+        const viewportWidth = window.innerWidth
+        const viewportHeight = window.innerHeight
+
+        let left = rect.left
+        let top = rect.bottom
+
+        if (left + 340 > viewportWidth) {
+            left = viewportWidth - 340
+        }
+
+        if (top + 144 > viewportHeight) {
+            top = viewportHeight - 144
+        }
+
+        showModal(trackId, { x: left, y: top })
+    }
 
     return (
         <div className="grid grid-cols-6">
@@ -116,7 +136,12 @@ const ShuffleTracks = () => {
                                 src={track.image_url}
                                 className="w-40 h-40 hover:scale-105 transition-transform duration-300"
                             />
-                            <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 translate-y-8 opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 ease-out">
+                            <div
+                                className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 translate-y-8 opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 ease-out"
+                                onClick={(e) =>
+                                    handleShowModal(track.track_id, e)
+                                }
+                            >
                                 <AddIcon color="var(--blue-1)" size={32} />
                             </div>
 
@@ -175,6 +200,24 @@ const PopularTracks = () => {
     }
 
     const { showPlayer } = useMusicPlayer()
+    const handleShowModal = (trackId: string, e: React.MouseEvent) => {
+        const rect = (e.target as HTMLElement).getBoundingClientRect()
+        const viewportWidth = window.innerWidth
+        const viewportHeight = window.innerHeight
+
+        let left = rect.left
+        let top = rect.bottom
+
+        if (left + 340 > viewportWidth) {
+            left = viewportWidth - 340
+        }
+
+        if (top + 144 > viewportHeight) {
+            top = viewportHeight - 144
+        }
+
+        showModal(trackId, { x: left, y: top })
+    }
 
     return (
         <div className="grid grid-cols-6">
@@ -200,7 +243,9 @@ const PopularTracks = () => {
                             />
                             <div
                                 className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 translate-y-8 opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 ease-out"
-                                onClick={() => showModal(track.track_id)}
+                                onClick={(e) =>
+                                    handleShowModal(track.track_id, e)
+                                }
                             >
                                 <AddIcon color="var(--blue-1)" size={32} />
                             </div>
