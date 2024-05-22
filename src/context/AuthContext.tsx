@@ -6,13 +6,13 @@ import React, {
     ReactNode,
 } from "react"
 import Cookies from "js-cookie"
-import { toast } from "react-toastify"
-import { validateToken } from "@/api/auth"
+import { validateToken, validateCreator } from "@/api/auth"
 
 interface AuthContextType {
     isLoggedIn: boolean | null
     loginContext: () => void
     logoutContext: () => void
+    isCreator: boolean
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -23,17 +23,21 @@ interface AuthProviderProps {
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
     const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null)
+    const [isCreator, setIsCreator] = useState<boolean>(false)
 
     useEffect(() => {
-        const checkToken = async () => {
-            const isValid = await validateToken()
-            setIsLoggedIn(!!isValid)
-            if (!isValid) {
+        const checkAuth = async () => {
+            const isValidToken = await validateToken()
+            setIsLoggedIn(!!isValidToken)
+            if (isValidToken) {
+                const isValidCreator = await validateCreator()
+                setIsCreator(!!isValidCreator)
+            } else {
                 Cookies.remove("token")
             }
         }
 
-        checkToken()
+        checkAuth()
     }, [])
 
     const loginContext = () => {
@@ -44,13 +48,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const logoutContext = () => {
         Cookies.remove("token")
         setIsLoggedIn(false)
-        toast.success("Logout successfully")
         window.location.reload()
     }
 
     return (
         <AuthContext.Provider
-            value={{ isLoggedIn, loginContext, logoutContext }}
+            value={{ isLoggedIn, loginContext, logoutContext, isCreator }}
         >
             {children}
         </AuthContext.Provider>

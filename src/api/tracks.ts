@@ -72,3 +72,15 @@ export const get_rcm_tracks = async (track_id: string) => {
         return []
     }
 }
+
+export const get_all_tracks_basic_info = async () => {
+    try {
+        const url = `${baseUrl}/track/get-all-tracks-basic-info`
+        const response = await axios.get(url)
+        const tracks: ITrackBasicInfo[] = response.data
+        return tracks
+    } catch (error) {
+        console.error("Error fetching tracks:", error)
+        return []
+    }
+}

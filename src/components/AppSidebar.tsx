@@ -8,6 +8,7 @@ import {
     LogInIcon,
     MailIcon,
     LockIcon,
+    ProfileIcon,
 } from "@/components/icons"
 import { usePathname } from "next/navigation"
 import {
@@ -44,7 +45,7 @@ export default function AppSidebar() {
         } transition-colors duration-600 cursor-pointer rounded-2xl`
     }
 
-    const { isLoggedIn, loginContext, logoutContext } = useAuth()
+    const { isLoggedIn, loginContext, logoutContext, isCreator } = useAuth()
 
     const { isOpen, onOpen, onOpenChange } = useDisclosure()
 
@@ -89,28 +90,51 @@ export default function AppSidebar() {
                         </Link>
                     </li>
                 </ul>
-                <ul className="px-4 py-4 gap-y-2 flex flex-col">
+
+                <div className="px-4 py-4 gap-y-2 flex flex-col">
                     <Divider className="mb-2" />
-                    {isLoggedIn === true ? (
-                        <li
-                            className="flex items-center py-3 px-4 hover:bg-zinc-800 transition-colors duration-600 cursor-pointer rounded-2xl"
-                            onClick={logoutContext}
+                    {isCreator ? (
+                        <Link
+                            href="/creator"
+                            className={getLinkClassName("/creator")}
                         >
-                            <LogOutIcon />
+                            <MusicIcon />
                             <p className="text-xl ml-3 font-semibold">
-                                Log Out
+                                Creator Zone
                             </p>
-                        </li>
+                        </Link>
+                    ) : null}
+                    {isLoggedIn ? (
+                        <div className="flex flex-col gap-y-2">
+                            <Link
+                                href={"/profile"}
+                                className={getLinkClassName("/profile")}
+                            >
+                                <ProfileIcon />
+                                <p className="text-xl ml-3 font-semibold">
+                                    My Profile
+                                </p>
+                            </Link>
+                            <div
+                                className="flex items-center py-3 px-4 hover:bg-zinc-800 transition-colors duration-600 cursor-pointer rounded-2xl"
+                                onClick={logoutContext}
+                            >
+                                <LogOutIcon />
+                                <p className="text-xl ml-3 font-semibold">
+                                    Log Out
+                                </p>
+                            </div>
+                        </div>
                     ) : (
-                        <li
+                        <div
                             className="flex items-center py-3 px-4 hover:bg-zinc-800 transition-colors duration-600 cursor-pointer rounded-2xl"
                             onClick={onOpen}
                         >
                             <LogInIcon />
                             <p className="text-xl ml-3 font-semibold">Log In</p>
-                        </li>
+                        </div>
                     )}
-                </ul>
+                </div>
             </div>
             <LoginModal
                 isOpen={isOpen}
@@ -176,9 +200,12 @@ const LoginModal = ({
                 setIsLoading(true)
                 const response = await login(email, password)
                 if (response) {
-                    toast.success("Login successfully!")
                     onOpenChange()
                     loginContext()
+                } else {
+                    toast.error(
+                        "Login failed! Please check your email and password again."
+                    )
                 }
             } catch (error) {
                 toast.error("Login failed!")
