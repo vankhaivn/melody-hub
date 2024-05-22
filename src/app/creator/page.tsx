@@ -1,36 +1,35 @@
 "use client"
-import React, { useState } from "react"
+import { useState, useMemo } from "react"
 import {
+    Table,
+    TableBody,
+    TableCell,
+    TableColumn,
+    TableHeader,
+    TableRow,
+    Pagination,
+    Spinner,
+    Avatar,
+    Button,
     Select,
     SelectItem,
     Input,
-    Spinner,
-    Button,
-    Avatar,
 } from "@nextui-org/react"
-import useSWR from "swr"
+import useSWR, { mutate } from "swr"
 import { get_all_artists } from "@/api/artists"
 import { get_all_genres } from "@/api/genres"
 import { useAuth } from "@/context/AuthContext"
-import { create_track } from "@/api/creator"
+import { create_track, get_all_my_created_tracks } from "@/api/creator"
 import { toast } from "react-toastify"
+import { formatDuration, formatView } from "@/utils/format"
+import { PlayIcon } from "@/components/icons"
+import { useMusicPlayer } from "@/context/MusicPlayerContext"
+import Link from "next/link"
 
 export default function CreatorPage() {
     const { isCreator } = useAuth()
 
-    if (!isCreator) {
-        return (
-            <div className="py-6 px-48">
-                <h1 className="text-danger-500 text-4xl font-bold">
-                    Access Denied
-                </h1>
-                <h1 className="text-danger-500 text-2xl font-semibold">
-                    You need to be a creator to view this page.
-                </h1>
-            </div>
-        )
-    }
-
+    // All hooks should be defined at the top level of the component
     const allArtistFetcher = () => get_all_artists()
     const allGenresFetcher = () => get_all_genres()
 
@@ -48,7 +47,7 @@ export default function CreatorPage() {
         data: allGenres,
         error: allGenresError,
         isValidating: isAllGenresValidating,
-    } = useSWR<IGenres[]>("allGenres", allGenresFetcher, {
+    } = useSWR("allGenres", allGenresFetcher, {
         revalidateIfStale: false,
         revalidateOnFocus: false,
         revalidateOnReconnect: false,
@@ -62,6 +61,19 @@ export default function CreatorPage() {
     const [trackFile, setTrackFile] = useState<File | null>(null)
     const [trackImage, setTrackImage] = useState<File | null>(null)
     const [isSubmitting, setIsSubmitting] = useState(false)
+
+    if (!isCreator) {
+        return (
+            <div className="py-6 px-48">
+                <h1 className="text-danger-500 text-4xl font-bold">
+                    Access Denied
+                </h1>
+                <h1 className="text-danger-500 text-2xl font-semibold">
+                    You need to be a creator to view this page.
+                </h1>
+            </div>
+        )
+    }
 
     const handleArtistSelectionChange = (e: any) => {
         setSelectedArtist(e.target.value)
@@ -106,7 +118,7 @@ export default function CreatorPage() {
             return
         }
 
-        if (duration < 10) {
+        if (duration < 5) {
             toast.error("Duration (s) must be greater than 10")
             return
         }
@@ -124,6 +136,8 @@ export default function CreatorPage() {
         const response = await create_track(trackData)
         if (response) {
             toast.success("Track created successfully", response)
+            mutate("tracksBasicInfo")
+            mutate("allOwnerTracks")
         } else {
             toast.error("Failed to create track")
         }
@@ -148,105 +162,253 @@ export default function CreatorPage() {
 
     return (
         <div className="py-8 px-16">
-            <form onSubmit={handleSubmit}>
-                <Input
-                    label="Track Name"
-                    value={trackName}
-                    onChange={(e) => setTrackName(e.target.value)}
-                    required
-                />
-                <div className="flex w-full max-w-xs flex-col gap-2 mt-4">
-                    <Select
-                        label="Select Artist"
-                        variant="flat"
-                        placeholder="Select an artist"
-                        selectedKeys={[selectedArtist]}
-                        className="max-w-xs"
-                        onChange={handleArtistSelectionChange}
-                        required
-                    >
-                        {(allArtists ?? []).map((artist) => (
-                            <SelectItem
-                                key={artist.artist_id}
-                                value={artist.artist_id}
-                            >
-                                <div className="flex gap-2 items-center">
+            <div className="bg-content1 p-6 rounded-xl">
+                <h1 className="mb-8 font-bold text-3xl">Create a new track</h1>
+                <form
+                    onSubmit={handleSubmit}
+                    className="flex flex-col gap-y-4 pb-2"
+                >
+                    <div className="flex gap-x-4">
+                        <label className="bg-content2 rounded-xl p-4">
+                            <div className="font-semibold text-medium">
+                                Choose your audio file (mp3){" "}
+                            </div>
+                            <input
+                                type="file"
+                                accept=".mp3"
+                                onChange={handleTrackFileChange}
+                                required
+                            />
+                        </label>
+                        <label className="bg-content2 rounded-xl p-4">
+                            <div className="font-semibold text-medium">
+                                Choose your track image file (jpg){" "}
+                            </div>
+                            <input
+                                type="file"
+                                accept=".jpg,.jpeg,.png"
+                                onChange={handleTrackImageChange}
+                                required
+                            />
+                        </label>
+                    </div>
+                    <div className="flex gap-x-4 justify-between">
+                        <Input
+                            label="Track Name"
+                            value={trackName}
+                            onChange={(e) => setTrackName(e.target.value)}
+                            required
+                            className="w-[24rem]"
+                            size="lg"
+                        />
+                        <Input
+                            label="Release Year"
+                            type="number"
+                            value={releaseYear.toString()}
+                            onChange={(e) =>
+                                setReleaseYear(Number(e.target.value))
+                            }
+                            required
+                            className="w-[24rem]"
+                            size="lg"
+                        />
+                        <Input
+                            label="Duration (seconds)"
+                            type="number"
+                            value={duration.toString()}
+                            onChange={(e) =>
+                                setDuration(Number(e.target.value))
+                            }
+                            required
+                            readOnly
+                            className="w-[24rem]"
+                            size="lg"
+                        />
+                    </div>
+                    <div className="flex gap-x-4 justify-start items-center">
+                        <Select
+                            label="Select Artist"
+                            variant="flat"
+                            placeholder="Select an artist"
+                            selectedKeys={[selectedArtist]}
+                            className="w-[22.4rem]"
+                            onChange={handleArtistSelectionChange}
+                            required
+                            size="lg"
+                        >
+                            {(allArtists ?? []).map((artist) => (
+                                <SelectItem
+                                    key={artist.artist_id}
+                                    value={artist.artist_id}
+                                >
+                                    {artist.artist_name}
+                                </SelectItem>
+                            ))}
+                        </Select>
+                        <Select
+                            label="Select Genre"
+                            variant="flat"
+                            placeholder="Select a genre"
+                            selectedKeys={[selectedGenre]}
+                            className="w-[22.4rem]"
+                            onChange={handleGenreSelectionChange}
+                            required
+                            size="lg"
+                        >
+                            {(allGenres ?? []).map((genre) => (
+                                <SelectItem
+                                    key={genre.genre_id}
+                                    value={genre.genre_id}
+                                >
+                                    {genre.genre_name}
+                                </SelectItem>
+                            ))}
+                        </Select>
+                        <Button
+                            type="submit"
+                            isLoading={isSubmitting}
+                            color="success"
+                            variant="shadow"
+                            size="lg"
+                            className="font-bold"
+                        >
+                            Submit
+                        </Button>
+                    </div>
+                </form>
+            </div>
+            <div className="bg-content1 p-6 rounded-xl mt-4">
+                <OwnerTrack />
+            </div>
+        </div>
+    )
+}
+
+const OwnerTrack = () => {
+    const allOwnerTracksFetcher = () => get_all_my_created_tracks()
+    const {
+        data: allOwnerTracks,
+        error: allOwnerTracksError,
+        isValidating: isAllOwnerTracksValidating,
+    } = useSWR("allOwnerTracks", allOwnerTracksFetcher, {
+        revalidateIfStale: false,
+        revalidateOnFocus: false,
+        revalidateOnReconnect: false,
+    })
+
+    const { showPlayer } = useMusicPlayer()
+    const [page, setPage] = useState(1)
+    const rowsPerPage = 4
+
+    const pages = Array.isArray(allOwnerTracks)
+        ? Math.ceil(allOwnerTracks.length / rowsPerPage)
+        : 0
+    const loadingState =
+        isAllOwnerTracksValidating || !Array.isArray(allOwnerTracks)
+            ? "loading"
+            : "idle"
+
+    const items = useMemo(() => {
+        if (Array.isArray(allOwnerTracks)) {
+            const start = (page - 1) * rowsPerPage
+            const end = start + rowsPerPage
+            return allOwnerTracks.slice(start, end).map((track, index) => ({
+                ...track,
+                rowIndex: start + index + 1,
+            }))
+        }
+        return []
+    }, [page, allOwnerTracks])
+
+    if (isAllOwnerTracksValidating) {
+        return <Spinner />
+    }
+    if (allOwnerTracks?.length === 0) {
+        return (
+            <h1 className="mb-8 font-bold text-3xl">
+                You have never uploaded any tracks
+            </h1>
+        )
+    }
+
+    return (
+        <div>
+            <h1 className="mb-8 font-bold text-3xl">Tracks uploaded by you</h1>
+            <Table
+                aria-label="Tracks uploaded by the user"
+                bottomContent={
+                    <div className="flex w-full justify-center">
+                        <Pagination
+                            isCompact
+                            showControls
+                            showShadow
+                            color="secondary"
+                            page={page}
+                            total={pages}
+                            onChange={(page) => setPage(page)}
+                        />
+                    </div>
+                }
+                classNames={{
+                    wrapper: "min-h-[222px]",
+                }}
+            >
+                <TableHeader>
+                    <TableColumn key="order">#</TableColumn>
+                    <TableColumn key="name">NAME</TableColumn>
+                    <TableColumn key="view">VIEW</TableColumn>
+                    <TableColumn key="duration">DURATION</TableColumn>
+                    <TableColumn key="year">RELEASE YEAR</TableColumn>
+                    <TableColumn key="action"> </TableColumn>
+                </TableHeader>
+
+                <TableBody
+                    items={items}
+                    loadingContent={<Spinner />}
+                    loadingState={loadingState}
+                >
+                    {(item) => (
+                        <TableRow
+                            key={item.track_name}
+                            className="cursor-pointer"
+                        >
+                            <TableCell className="font-semibold group-hover:text-success-500 transition-colors duration-400">
+                                {item.rowIndex}
+                            </TableCell>
+                            <TableCell className="font-semibold group-hover:text-success-500 transition-colors duration-400">
+                                <Link
+                                    href={`/track/${item.track_id}`}
+                                    className="flex items-center"
+                                >
                                     <Avatar
-                                        alt={artist.artist_name}
-                                        className="flex-shrink-0"
-                                        size="sm"
-                                        src={artist.artist_image}
+                                        isBordered
+                                        radius="md"
+                                        src={item.image_url}
+                                        className="mr-4"
                                     />
-                                    <div className="flex flex-col">
-                                        <span className="text-small">
-                                            {artist.artist_name}
-                                        </span>
-                                        <span className="text-tiny text-default-400">
-                                            {artist.country}
-                                        </span>
-                                    </div>
-                                </div>
-                            </SelectItem>
-                        ))}
-                    </Select>
-                    <p className="text-small text-default-500">
-                        Selected Artist: {selectedArtist}
-                    </p>
-                </div>
-                <div className="flex w-full max-w-xs flex-col gap-2 mt-4">
-                    <Select
-                        label="Select Genre"
-                        variant="flat"
-                        placeholder="Select a genre"
-                        selectedKeys={[selectedGenre]}
-                        className="max-w-xs"
-                        onChange={handleGenreSelectionChange}
-                        required
-                    >
-                        {(allGenres ?? []).map((genre) => (
-                            <SelectItem
-                                key={genre.genre_id}
-                                value={genre.genre_id}
-                            >
-                                {genre.genre_name}
-                            </SelectItem>
-                        ))}
-                    </Select>
-                    <p className="text-small text-default-500">
-                        Selected Genre: {selectedGenre}
-                    </p>
-                </div>
-                <Input
-                    label="Release Year"
-                    type="number"
-                    value={releaseYear.toString()}
-                    onChange={(e) => setReleaseYear(Number(e.target.value))}
-                    required
-                />
-                <Input
-                    label="Duration (seconds)"
-                    type="number"
-                    value={duration.toString()}
-                    onChange={(e) => setDuration(Number(e.target.value))}
-                    required
-                    readOnly
-                />
-                <input
-                    type="file"
-                    accept=".mp3"
-                    onChange={handleTrackFileChange}
-                    required
-                />
-                <input
-                    type="file"
-                    accept=".jpg,.jpeg,.png"
-                    onChange={handleTrackImageChange}
-                    required
-                />
-                <Button type="submit" className="mt-4" isLoading={isSubmitting}>
-                    Submit
-                </Button>
-            </form>
+                                    {item.track_name}
+                                </Link>
+                            </TableCell>
+                            <TableCell className="font-semibold group-hover:text-success-500 transition-colors duration-400">
+                                {formatView(item.view)}
+                            </TableCell>
+                            <TableCell className="font-semibold group-hover:text-success-500 transition-colors duration-400">
+                                {formatDuration(item.duration)}
+                            </TableCell>
+                            <TableCell className="font-semibold group-hover:text-success-500 transition-colors duration-400">
+                                {item.release_year}
+                            </TableCell>
+                            <TableCell onClick={() => showPlayer([item])}>
+                                <PlayIcon
+                                    color="var(--primary)"
+                                    size={32}
+                                    className="mb-1 group-hover:scale-125 transition-transform duration-400 cursor-pointer"
+                                />
+                            </TableCell>
+                        </TableRow>
+                    )}
+                </TableBody>
+            </Table>
         </div>
     )
 }

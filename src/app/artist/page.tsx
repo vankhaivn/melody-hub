@@ -23,6 +23,7 @@ import { useMusicPlayer } from "@/context/MusicPlayerContext"
 import useSWR from "swr"
 import { useState, useMemo } from "react"
 import { formatView, formatDuration } from "@/utils/format"
+import Link from "next/link"
 
 export default function ArtistPage() {
     const artistFetcher = () => get_all_artists()
@@ -290,14 +291,19 @@ const RenderModal = ({
                                         <TableCell className="font-semibold group-hover:text-success-500 transition-colors duration-400">
                                             {item.rowIndex}
                                         </TableCell>
-                                        <TableCell className="flex items-center font-semibold group-hover:text-success-500 transition-colors duration-400">
-                                            <Avatar
-                                                isBordered
-                                                radius="md"
-                                                src={item.image_url}
-                                                className="mr-4"
-                                            />
-                                            {item.track_name}
+                                        <TableCell className="group-hover:text-success-500 transition-colors duration-400">
+                                            <Link
+                                                className="flex items-center font-semibold"
+                                                href={`/track/${item.track_id}`}
+                                            >
+                                                <Avatar
+                                                    isBordered
+                                                    radius="md"
+                                                    src={item.image_url}
+                                                    className="mr-4"
+                                                />
+                                                {item.track_name}
+                                            </Link>
                                         </TableCell>
                                         <TableCell className="font-semibold group-hover:text-success-500 transition-colors duration-400">
                                             {formatView(item.view)}

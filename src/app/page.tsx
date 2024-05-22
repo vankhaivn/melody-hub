@@ -53,7 +53,13 @@ export default function Home() {
                             </p>
                         </div>
                     </div>
-                    <Button radius="full" size="sm">
+                    <Button
+                        radius="full"
+                        size="md"
+                        variant="shadow"
+                        color="primary"
+                        className="font-bold"
+                    >
                         Get App
                     </Button>
                 </CardFooter>
@@ -71,17 +77,17 @@ export default function Home() {
                 <Card className="col-span-12 sm:col-span-4 h-[300px]">
                     <CardHeader className="absolute z-10 top-1 flex-col !items-start">
                         <p className="text-tiny text-white/60 uppercase font-bold">
-                            What to watch
+                            Music
                         </p>
                         <h4 className="text-white font-medium text-large">
-                            Stream the Acme event
+                            Immerse yourself in music
                         </h4>
                     </CardHeader>
                     <Image
                         removeWrapper
                         alt="Card background"
                         className="z-0 w-full h-full object-cover hover:scale-125 duration-700 cursor-pointer"
-                        src="https://nextui.org/images/card-example-4.jpeg"
+                        src="https://images.wallpaperscraft.com/image/single/headphones_audio_black_134032_1920x1080.jpg"
                     />
                 </Card>
                 <Card className="col-span-12 sm:col-span-4 h-[300px]">
@@ -97,7 +103,7 @@ export default function Home() {
                         removeWrapper
                         alt="Card background"
                         className="z-0 w-full h-full object-cover hover:scale-125 duration-700 cursor-pointer"
-                        src="https://nextui.org/images/card-example-3.jpeg"
+                        src="https://images.wallpaperscraft.com/image/single/girl_dance_music_178865_1920x1080.jpg"
                     />
                 </Card>
                 <Card className="col-span-12 sm:col-span-4 h-[300px]">
@@ -113,7 +119,7 @@ export default function Home() {
                         removeWrapper
                         alt="Card background"
                         className="z-0 w-full h-full object-cover hover:scale-125 duration-700 cursor-pointer"
-                        src="https://nextui.org/images/card-example-2.jpeg"
+                        src="https://images.wallpaperscraft.com/image/single/singer_silhouette_smoke_125427_1920x1080.jpg"
                     />
                 </Card>
                 <Card className="col-span-12 sm:col-span-7 h-[300px]">
@@ -129,7 +135,7 @@ export default function Home() {
                         removeWrapper
                         alt="Card background"
                         className="z-0 w-full h-full object-cover hover:scale-125 duration-700 cursor-pointer"
-                        src="https://nextui.org/images/card-example-2.jpeg"
+                        src="https://images.wallpaperscraft.com/image/single/dj_pose_console_982208_1600x900.jpg"
                     />
                 </Card>
                 <Card className="col-span-12 sm:col-span-5 h-[300px]">
@@ -145,7 +151,7 @@ export default function Home() {
                         removeWrapper
                         alt="Card background"
                         className="z-0 w-full h-full object-cover hover:scale-125 duration-700 cursor-pointer"
-                        src="https://nextui.org/images/card-example-3.jpeg"
+                        src="https://images.wallpaperscraft.com/image/single/dj_music_disco_173199_1920x1080.jpg"
                     />
                 </Card>
             </div>

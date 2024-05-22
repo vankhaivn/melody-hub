@@ -46,3 +46,87 @@ export const create_track = async ({
         return null
     }
 }
+
+export const get_all_my_created_tracks = async () => {
+    const token = Cookies.get("token")
+    if (!token) {
+        console.log("Token is not found")
+        return null
+    }
+    try {
+        const url = `${baseUrl}/creator/get-all-my-created-tracks`
+        const response = await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        })
+
+        if (response.data) {
+            const tracks: ITrack[] = response.data
+            return tracks
+        } else {
+            return null
+        }
+    } catch (error) {
+        console.error("Error:", error)
+        return null
+    }
+}
+
+export const remove_my_created_track = async (track_id: string) => {
+    const token = Cookies.get("token")
+    if (!token) {
+        console.log("Token is not found")
+        return null
+    }
+    try {
+        const url = `${baseUrl}/creator/remove-my-track`
+        const response = await axios.post(
+            url,
+            { track_id },
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        )
+
+        if (response.data) {
+            return response.data
+        } else {
+            return null
+        }
+    } catch (error) {
+        console.error("Error:", error)
+        return null
+    }
+}
+
+export const is_created_track_by_me = async (track_id: string) => {
+    const token = Cookies.get("token")
+    if (!token) {
+        console.log("Token is not found")
+        return false
+    }
+    try {
+        const url = `${baseUrl}/creator/is-created-by`
+        const response = await axios.post(
+            url,
+            { track_id },
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        )
+
+        if (response.status === 200) {
+            return true
+        } else {
+            return false
+        }
+    } catch (error) {
+        console.error("Error:", error)
+        return false
+    }
+}

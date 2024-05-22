@@ -20,14 +20,15 @@ import {
     Avatar,
 } from "@nextui-org/react"
 import { PlayIcon } from "@/components/icons"
-import useSWR from "swr"
-import { useState } from "react"
+import useSWR, { mutate } from "swr"
+import { useEffect, useState } from "react"
 import { useMusicPlayer } from "@/context/MusicPlayerContext"
 import { add_track_to_playlist, get_all_playlist } from "@/api/playlist"
 import { toast } from "react-toastify"
 import { useAuth } from "@/context/AuthContext"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import { is_created_track_by_me, remove_my_created_track } from "@/api/creator"
 
 export default function DetailTrackPage({
     params,
@@ -35,6 +36,7 @@ export default function DetailTrackPage({
     params: { id: string }
 }) {
     const { isLoggedIn } = useAuth()
+    const router = useRouter()
     const { showPlayer } = useMusicPlayer()
     const trackFetcher = () => get_track_by_id(params.id)
     const {
@@ -46,6 +48,19 @@ export default function DetailTrackPage({
         revalidateOnFocus: false,
         revalidateOnReconnect: false,
     })
+
+    const [isCreatedTrack, setIsCreatedTrack] = useState(false)
+    const [isRemovingTrack, setIsRemovingTrack] = useState(false)
+
+    useEffect(() => {
+        const isCreatedTrackByMe = async () => {
+            const response = await is_created_track_by_me(params.id)
+            if (response) {
+                setIsCreatedTrack(true)
+            }
+        }
+        isCreatedTrackByMe()
+    }, [])
 
     if (trackError) {
         return <div>Track not found!</div>
@@ -62,6 +77,26 @@ export default function DetailTrackPage({
     const handlePlay = (track: ITrack) => {
         const trackData = { ...track }
         showPlayer([trackData])
+    }
+
+    const handleRemoveTrack = async () => {
+        try {
+            setIsRemovingTrack(true)
+            const response = await remove_my_created_track(params.id)
+            if (response) {
+                setIsCreatedTrack(false)
+                toast.success("Track removed successfully!")
+                mutate(`track_${params.id}`)
+                router.push("/creator")
+            } else {
+                toast.error("Failed to remove track!")
+            }
+        } catch (error) {
+            console.error(error)
+            toast.error("Failed to remove track!")
+        } finally {
+            setIsRemovingTrack(false)
+        }
     }
 
     return (
@@ -103,7 +138,7 @@ export default function DetailTrackPage({
                 </div>
             </div>
             <div
-                className="mt-0 flex gap-x-6 p-4 rounded-b-xl items-center"
+                className="mt-0 flex gap-x-6 p-4 rounded-b-xl items-center relative"
                 style={{
                     backgroundColor: "var(--gray-1)",
                 }}
@@ -147,6 +182,24 @@ export default function DetailTrackPage({
                         </PopoverTrigger>
                         <AddTrackToPlaylist trackId={params.id} />
                     </Popover>
+                    {isCreatedTrack && (
+                        <Tooltip
+                            content="Others and you will not see this track!"
+                            size="lg"
+                            color="danger"
+                        >
+                            <Button
+                                color="danger"
+                                variant="flat"
+                                className="absolute right-8 font-bold text-large"
+                                size="lg"
+                                isLoading={isRemovingTrack}
+                                onClick={handleRemoveTrack}
+                            >
+                                Remove
+                            </Button>
+                        </Tooltip>
+                    )}
                 </div>
             </div>
             <div className="mt-4">
