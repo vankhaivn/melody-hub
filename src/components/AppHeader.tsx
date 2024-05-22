@@ -15,25 +15,8 @@ import {
 import Link from "next/link"
 
 import { SearchIcon } from "@/components/icons"
-import { get_user_information } from "@/api/account"
-import useSWR from "swr"
-import Cookies from "js-cookie"
 
 export default function AppHeader() {
-    const userInfoFetcher = () => get_user_information()
-    const {
-        data: userInfo,
-        error: userInfoError,
-        isValidating: isuserInfoValidating,
-    } = useSWR<IAccount | null>("userInfo", userInfoFetcher, {
-        revalidateIfStale: false,
-        revalidateOnFocus: false,
-        revalidateOnReconnect: false,
-    })
-
-    if (userInfo) {
-        Cookies.set("user_info", JSON.stringify(userInfo))
-    }
     return (
         <Navbar
             isBordered
