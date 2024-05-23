@@ -38,7 +38,7 @@ import {
     delete_playlist,
     change_playlist_name,
 } from "@/api/playlist"
-import useSWR from "swr"
+import useSWR, { mutate } from "swr"
 import { toast } from "react-toastify"
 
 export default function PlaylistPage() {
@@ -55,7 +55,6 @@ export default function PlaylistPage() {
         data: playlists,
         error: playlistsError,
         isValidating: playlistsValidating,
-        mutate: mutatePlaylists,
     } = useSWR<IPlaylist[]>("all_playlists", playlistsFetcher, {
         revalidateIfStale: false,
         revalidateOnFocus: false,
@@ -98,7 +97,7 @@ export default function PlaylistPage() {
             if (response) {
                 toast.success("Playlist created successfully")
                 setPlaylistName("")
-                mutatePlaylists() // Revalidate playlists
+                mutate("all_playlists") // Revalidate playlists
             } else {
                 toast.error("Failed to create playlist")
             }
@@ -118,7 +117,6 @@ export default function PlaylistPage() {
                         playlist={selectedPlaylist}
                         isOpen={isOpen}
                         onClose={onClose}
-                        mutatePlaylists={mutatePlaylists}
                     />
                 )}
             </div>
@@ -235,12 +233,10 @@ const PlaylistModal = ({
     playlist,
     isOpen,
     onClose,
-    mutatePlaylists,
 }: {
     playlist: IPlaylist
     isOpen: any
     onClose: any
-    mutatePlaylists: () => void
 }) => {
     const [isLoadingDeleteButton, setIsLoadingDeleteButton] = useState(false)
     const { showPlayer } = useMusicPlayer()
@@ -251,7 +247,6 @@ const PlaylistModal = ({
         data: tracks,
         error: tracksError,
         isValidating: tracksValidating,
-        mutate: mutateTracks,
     } = useSWR<ITrack[]>(
         `all_tracks_in_${playlist.playlist_id}`,
         () => get_tracks_by_playlist_id(playlist.playlist_id),
@@ -270,7 +265,6 @@ const PlaylistModal = ({
         data: tracksRecommend,
         error: tracksRecommendError,
         isValidating: tracksRecommendValidating,
-        mutate: mutateTracksRecommend,
     } = useSWR<ITrack[]>(
         `all_track_recommend_in_${playlist.playlist_id}`,
         () => get_recommend_tracks_by_playlist_id(playlist.playlist_id),
@@ -295,7 +289,7 @@ const PlaylistModal = ({
             if (response) {
                 toast.success("Playlist deleted successfully")
                 onClose()
-                mutatePlaylists() // Revalidate playlists
+                mutate("all_playlists") // Revalidate playlists
             } else {
                 toast.error("Failed to delete playlist")
             }
@@ -320,7 +314,7 @@ const PlaylistModal = ({
             if (response) {
                 toast.success("Playlist updated successfully!")
                 setIsEditing(false)
-                mutatePlaylists()
+                mutate("all_playlists") // Revalidate playlists
             } else {
                 toast.error("Failed to update playlist!")
             }
@@ -461,7 +455,6 @@ const PlaylistModal = ({
                                 tracks={tracks}
                                 onClose={onClose}
                                 tracksValidating={tracksValidating}
-                                mutateTracks={mutateTracks}
                                 playlistId={playlist.playlist_id}
                                 showPlayer={showPlayer}
                             />
@@ -471,8 +464,6 @@ const PlaylistModal = ({
                                     tracksRecommendValidating
                                 }
                                 playlistId={playlist.playlist_id}
-                                mutateTracks={mutateTracks}
-                                mutateTracksRecommend={mutateTracksRecommend}
                             />
                         </div>
                     </ModalBody>
@@ -486,14 +477,12 @@ const TracksTable = ({
     tracks,
     onClose,
     tracksValidating,
-    mutateTracks,
     playlistId,
     showPlayer,
 }: {
     tracks: ITrack[] | [] | undefined
     onClose: any
     tracksValidating: boolean
-    mutateTracks: () => void
     playlistId: string
     showPlayer: (tracks: ITrack[]) => void
 }) => {
@@ -517,6 +506,13 @@ const TracksTable = ({
     }, [page, tracks])
 
     const deleteTrack = async (trackId: string) => {
+        if (
+            !window.confirm(
+                "Are you sure you want to remove the music from this playlist?"
+            )
+        ) {
+            return
+        }
         setLoadingTrackId(trackId)
         try {
             const response = await remove_track_from_playlist({
@@ -525,7 +521,7 @@ const TracksTable = ({
             })
             if (response) {
                 toast.success("Track deleted successfully")
-                mutateTracks()
+                mutate(`all_tracks_in_${playlistId}`)
             } else {
                 toast.error("Failed to delete track")
             }
@@ -644,14 +640,10 @@ const RecommendPlaylist = ({
     tracksRecommend,
     tracksRecommendValidating,
     playlistId,
-    mutateTracks,
-    mutateTracksRecommend,
 }: {
     tracksRecommend: ITrack[] | undefined
     tracksRecommendValidating: boolean
     playlistId: string
-    mutateTracks: () => void
-    mutateTracksRecommend: () => void
 }) => {
     const loadingState = tracksRecommendValidating ? "loading" : "idle"
     const [loadingTrackId, setLoadingTrackId] = useState<string | null>(null)
@@ -665,8 +657,8 @@ const RecommendPlaylist = ({
             })
             if (response) {
                 toast.success("Track added to playlist")
-                mutateTracks()
-                mutateTracksRecommend()
+                mutate(`all_tracks_in_${playlistId}`)
+                mutate(`all_track_recommend_in_${playlistId}`)
             } else {
                 toast.error("Failed to add track to playlist")
             }
@@ -756,8 +748,8 @@ const RecommendPlaylist = ({
                 color="primary"
                 size="lg"
                 onClick={() => {
-                    mutateTracks()
-                    mutateTracksRecommend()
+                    mutate(`all_tracks_in_${playlistId}`)
+                    mutate(`all_track_recommend_in_${playlistId}`)
                 }}
             >
                 Refresh

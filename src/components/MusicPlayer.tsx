@@ -1,6 +1,6 @@
 "use client"
 import { useState, useRef, useEffect } from "react"
-import { Card, Image, Button, Slider } from "@nextui-org/react"
+import { Card, Image, Button, Slider, Tooltip } from "@nextui-org/react"
 import {
     PauseCircleIcon,
     NextIcon,
@@ -8,6 +8,8 @@ import {
     PlayIcon,
     VolumeHighIcon,
     VolumeLowIcon,
+    DownloadIcon,
+    CloseIcon,
 } from "@/components/icons"
 import { Select, SelectItem } from "@nextui-org/react"
 import { useMusicPlayer } from "@/context/MusicPlayerContext"
@@ -229,13 +231,25 @@ export default function MusicPlayer({ tracks }: { tracks: ITrack[] }) {
                             </Button>
                         }
                     />
+                    <Tooltip content="Download this track" color="primary">
+                        <Button
+                            variant="flat"
+                            color="primary"
+                            className="font-bold ml-4"
+                            onClick={() => {
+                                window.open(currentTrack.track_url, "_blank")
+                            }}
+                        >
+                            <DownloadIcon size={24} />
+                        </Button>
+                    </Tooltip>
                     <Button
                         variant="flat"
                         color="danger"
                         className="font-bold ml-4"
                         onClick={hidePlayer}
                     >
-                        Close
+                        <CloseIcon size={24} />
                     </Button>
                 </div>
             </div>

@@ -252,6 +252,7 @@ const AddTrackToPlaylist = ({ trackId }: { trackId: string }) => {
             })
             if (response) {
                 toast.success("Track added to playlist successfully!")
+                mutate("all_playlists")
             } else {
                 toast.error("Track already exists in playlist!")
             }
