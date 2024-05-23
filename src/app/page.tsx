@@ -87,7 +87,7 @@ export default function Home() {
                         removeWrapper
                         alt="Card background"
                         className="z-0 w-full h-full object-cover hover:scale-125 duration-700 cursor-pointer"
-                        src="https://images.wallpaperscraft.com/image/single/headphones_audio_black_134032_1920x1080.jpg"
+                        src="/img1.jpg"
                     />
                 </Card>
                 <Card className="col-span-12 sm:col-span-4 h-[300px]">
@@ -103,7 +103,7 @@ export default function Home() {
                         removeWrapper
                         alt="Card background"
                         className="z-0 w-full h-full object-cover hover:scale-125 duration-700 cursor-pointer"
-                        src="https://images.wallpaperscraft.com/image/single/girl_dance_music_178865_1920x1080.jpg"
+                        src="/img2.jpg"
                     />
                 </Card>
                 <Card className="col-span-12 sm:col-span-4 h-[300px]">
@@ -119,7 +119,7 @@ export default function Home() {
                         removeWrapper
                         alt="Card background"
                         className="z-0 w-full h-full object-cover hover:scale-125 duration-700 cursor-pointer"
-                        src="https://images.wallpaperscraft.com/image/single/singer_silhouette_smoke_125427_1920x1080.jpg"
+                        src="/img3.jpg"
                     />
                 </Card>
                 <Card className="col-span-12 sm:col-span-7 h-[300px]">
@@ -135,7 +135,7 @@ export default function Home() {
                         removeWrapper
                         alt="Card background"
                         className="z-0 w-full h-full object-cover hover:scale-125 duration-700 cursor-pointer"
-                        src="https://images.wallpaperscraft.com/image/single/dj_pose_console_982208_1600x900.jpg"
+                        src="/img4.jpg"
                     />
                 </Card>
                 <Card className="col-span-12 sm:col-span-5 h-[300px]">
@@ -151,7 +151,7 @@ export default function Home() {
                         removeWrapper
                         alt="Card background"
                         className="z-0 w-full h-full object-cover hover:scale-125 duration-700 cursor-pointer"
-                        src="https://images.wallpaperscraft.com/image/single/dj_music_disco_173199_1920x1080.jpg"
+                        src="/img5.jpg"
                     />
                 </Card>
             </div>
