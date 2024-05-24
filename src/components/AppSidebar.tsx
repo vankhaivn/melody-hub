@@ -116,7 +116,7 @@ export default function AppSidebar() {
                                 </p>
                             </Link>
                             <div
-                                className="flex items-center py-3 px-4 hover:bg-zinc-800 transition-colors duration-600 cursor-pointer rounded-2xl"
+                                className="flex items-center py-3 px-4 border-2 border-danger-500 text-danger-500 hover:bg-danger-500 hover:text-white transition-colors duration-600 cursor-pointer rounded-2xl"
                                 onClick={logoutContext}
                             >
                                 <LogOutIcon />
@@ -127,7 +127,7 @@ export default function AppSidebar() {
                         </div>
                     ) : (
                         <div
-                            className="flex items-center py-3 px-4 hover:bg-zinc-800 transition-colors duration-600 cursor-pointer rounded-2xl"
+                            className="flex items-center py-3 px-4 border-2 border-success-400 text-success-400 hover:bg-success-400 hover:text-white  transition-colors duration-600 cursor-pointer rounded-2xl"
                             onClick={onOpen}
                         >
                             <LogInIcon />
@@ -182,7 +182,6 @@ const LoginModal = ({
                 const response = await register(email, fullname, password)
                 if (response) {
                     toast.success("Register successfully!")
-                    onOpenChange()
                     setModalMode("login")
                 }
             } catch (error) {
@@ -213,6 +212,20 @@ const LoginModal = ({
             } finally {
                 setIsLoading(false)
             }
+        }
+    }
+
+    const handleKeyPressLogin = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "Enter") {
+            loginSubmit(email, password)
+        }
+    }
+
+    const handleKeyPressRegister = (
+        e: React.KeyboardEvent<HTMLInputElement>
+    ) => {
+        if (e.key === "Enter") {
+            registerSubmit(email, fullname, password, confirmPassword)
         }
     }
 
@@ -252,6 +265,7 @@ const LoginModal = ({
                                     type="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
+                                    onKeyPress={handleKeyPressLogin}
                                 />
                                 <Input
                                     endContent={
@@ -265,6 +279,7 @@ const LoginModal = ({
                                     onChange={(e) =>
                                         setPassword(e.target.value)
                                     }
+                                    onKeyPress={handleKeyPressLogin}
                                 />
                                 <div className="flex py-2 px-1 justify-between">
                                     <Checkbox
@@ -329,9 +344,9 @@ const LoginModal = ({
                                     type="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
+                                    onKeyPress={handleKeyPressRegister}
                                 />
                                 <Input
-                                    autoFocus
                                     endContent={
                                         <MailIcon className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
                                     }
@@ -344,6 +359,7 @@ const LoginModal = ({
                                     onChange={(e) =>
                                         setFullname(e.target.value)
                                     }
+                                    onKeyPress={handleKeyPressRegister}
                                 />
                                 <Input
                                     endContent={
@@ -358,6 +374,7 @@ const LoginModal = ({
                                     onChange={(e) =>
                                         setPassword(e.target.value)
                                     }
+                                    onKeyPress={handleKeyPressRegister}
                                 />
                                 <Input
                                     endContent={
@@ -371,6 +388,7 @@ const LoginModal = ({
                                     onChange={(e) =>
                                         setConfirmPassword(e.target.value)
                                     }
+                                    onKeyPress={handleKeyPressRegister}
                                 />
                             </ModalBody>
                             <ModalFooter>

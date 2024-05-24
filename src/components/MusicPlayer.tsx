@@ -13,6 +13,7 @@ import {
 } from "@/components/icons"
 import { Select, SelectItem } from "@nextui-org/react"
 import { useMusicPlayer } from "@/context/MusicPlayerContext"
+import Link from "next/link"
 
 export default function MusicPlayer({ tracks }: { tracks: ITrack[] }) {
     const {
@@ -137,11 +138,21 @@ export default function MusicPlayer({ tracks }: { tracks: ITrack[] }) {
                         height="52px"
                         width="52px"
                     />
-                    <p className="ml-4 font-bold">
-                        {currentTrack.track_name}{" "}
-                        <span className="text-success">by</span>{" "}
-                        {currentTrack.artist_name}
-                    </p>
+                    <div className="ml-4 font-bold flex gap-x-1">
+                        <Link
+                            href={`/track/${currentTrack.track_id}`}
+                            className="hover:underline"
+                        >
+                            {currentTrack.track_name}
+                        </Link>
+                        <span className="text-success">by</span>
+                        <Link
+                            href={`/artist/${currentTrack.artist_id}`}
+                            className="hover:underline"
+                        >
+                            {currentTrack.artist_name}
+                        </Link>
+                    </div>
                 </div>
                 <div className="col-span-1">
                     <SelectPlaylist

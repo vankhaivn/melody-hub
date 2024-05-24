@@ -11,6 +11,7 @@ import { AcmeLogo } from "@/components/icons/components/AcmeLogo"
 import { toast } from "react-toastify"
 import { useMusicPlayer } from "@/context/MusicPlayerContext"
 import { get_all_artists } from "@/api/artists"
+import Link from "next/link"
 
 export default function Home() {
     const { showPlayer, hidePlayer } = useMusicPlayer()
@@ -83,36 +84,40 @@ export default function Home() {
                             Immerse yourself in music
                         </h4>
                     </CardHeader>
-                    <Image
-                        removeWrapper
-                        alt="Card background"
-                        className="z-0 w-full h-full object-cover hover:scale-125 duration-700 cursor-pointer"
-                        src="/img1.jpg"
-                    />
+                    <Link href="/track" className="w-full h-full">
+                        <Image
+                            removeWrapper
+                            alt="Card background"
+                            className="z-0 w-full h-full object-cover hover:scale-125 duration-700 cursor-pointer"
+                            src="/img1.jpg"
+                        />
+                    </Link>
                 </Card>
                 <Card className="col-span-12 sm:col-span-4 h-[300px]">
                     <CardHeader className="absolute z-10 top-1 flex-col !items-start">
                         <p className="text-tiny text-white/60 uppercase font-bold">
-                            Plant a tree
+                            Artist
                         </p>
                         <h4 className="text-white font-medium text-large">
-                            Contribute to the planet
+                            Top artists with their musical masterpieces
                         </h4>
                     </CardHeader>
-                    <Image
-                        removeWrapper
-                        alt="Card background"
-                        className="z-0 w-full h-full object-cover hover:scale-125 duration-700 cursor-pointer"
-                        src="/img2.jpg"
-                    />
+                    <Link href="/artist" className="w-full h-full">
+                        <Image
+                            removeWrapper
+                            alt="Card background"
+                            className="z-0 w-full h-full object-cover hover:scale-125 duration-700 cursor-pointer"
+                            src="/img2.jpg"
+                        />
+                    </Link>
                 </Card>
                 <Card className="col-span-12 sm:col-span-4 h-[300px]">
                     <CardHeader className="absolute z-10 top-1 flex-col !items-start">
                         <p className="text-tiny text-white/60 uppercase font-bold">
-                            Supercharged
+                            Show
                         </p>
                         <h4 className="text-white font-medium text-large">
-                            Creates beauty like a beast
+                            Top shows full of emotions
                         </h4>
                     </CardHeader>
                     <Image
@@ -125,34 +130,38 @@ export default function Home() {
                 <Card className="col-span-12 sm:col-span-7 h-[300px]">
                     <CardHeader className="absolute z-10 top-1 flex-col !items-start">
                         <p className="text-tiny text-white/60 uppercase font-bold">
-                            Supercharged
+                            Playlist
                         </p>
                         <h4 className="text-white font-medium text-large">
-                            Creates beauty like a beast
+                            Create your own personalized music playlist
                         </h4>
                     </CardHeader>
-                    <Image
-                        removeWrapper
-                        alt="Card background"
-                        className="z-0 w-full h-full object-cover hover:scale-125 duration-700 cursor-pointer"
-                        src="/img4.jpg"
-                    />
+                    <Link href="/playlist" className="w-full h-full">
+                        <Image
+                            removeWrapper
+                            alt="Card background"
+                            className="z-0 w-full h-full object-cover hover:scale-125 duration-700 cursor-pointer"
+                            src="/img4.jpg"
+                        />
+                    </Link>
                 </Card>
                 <Card className="col-span-12 sm:col-span-5 h-[300px]">
                     <CardHeader className="absolute z-10 top-1 flex-col !items-start">
                         <p className="text-tiny text-white/60 uppercase font-bold">
-                            Supercharged
+                            Creator
                         </p>
                         <h4 className="text-white font-medium text-large">
-                            Creates beauty like a beast
+                            Upload music you want to share with the community
                         </h4>
                     </CardHeader>
-                    <Image
-                        removeWrapper
-                        alt="Card background"
-                        className="z-0 w-full h-full object-cover hover:scale-125 duration-700 cursor-pointer"
-                        src="/img5.jpg"
-                    />
+                    <Link href="/creator" className="w-full h-full">
+                        <Image
+                            removeWrapper
+                            alt="Card background"
+                            className="z-0 w-full h-full object-cover hover:scale-125 duration-700 cursor-pointer"
+                            src="/img5.jpg"
+                        />
+                    </Link>
                 </Card>
             </div>
         </div>

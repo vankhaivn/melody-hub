@@ -132,23 +132,6 @@ export default function AppHeader() {
                         />
                     </div>
                 </NavbarContent>
-                <NavbarContent className="hidden sm:flex" justify="start">
-                    <NavbarItem isActive>
-                        <Link href="#" color="success">
-                            Trending
-                        </Link>
-                    </NavbarItem>
-                    <NavbarItem>
-                        <Link href="#" color="foreground">
-                            Genres
-                        </Link>
-                    </NavbarItem>
-                    <NavbarItem>
-                        <Link color="foreground" href="#">
-                            Mood
-                        </Link>
-                    </NavbarItem>
-                </NavbarContent>
                 <NavbarContent className="hidden sm:flex" justify="end">
                     {!isLoggedIn ? (
                         <div className="hidden">None</div>

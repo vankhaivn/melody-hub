@@ -6,7 +6,7 @@ import { useMusicPlayer } from "@/context/MusicPlayerContext"
 import { formatDuration, formatTrackName, formatView } from "@/utils/format"
 import { useState } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import useSWR from "swr"
+import useSWR, { mutate } from "swr"
 import { faClock, faEye, faUserPen } from "@fortawesome/free-solid-svg-icons"
 import { useRouter } from "next/navigation"
 
@@ -34,7 +34,10 @@ export default function TrackPage() {
                     <Switch
                         defaultSelected
                         isSelected={isShuffle}
-                        onValueChange={setIsShuffle}
+                        onChange={() => {
+                            setIsShuffle(!isShuffle)
+                            mutate("shuffle_tracks")
+                        }}
                         size="lg"
                         color="secondary"
                         startContent={<ShuffleIcon size={16} />}
@@ -73,7 +76,7 @@ export default function TrackPage() {
 }
 
 const ShuffleTracks = () => {
-    const shuffleTracksFetcher = () => get_shuffle_tracks(12)
+    const shuffleTracksFetcher = () => get_shuffle_tracks(18)
     const {
         data: shuffleTracks,
         error: shuffleTracksError,
@@ -146,7 +149,7 @@ const ShuffleTracks = () => {
 }
 
 const PopularTracks = () => {
-    const popularTracksFetcher = () => get_top_trending_tracks(12)
+    const popularTracksFetcher = () => get_top_trending_tracks(18)
     const {
         data: popularTracks,
         error: popularTracksError,

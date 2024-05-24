@@ -522,6 +522,7 @@ const TracksTable = ({
             if (response) {
                 toast.success("Track deleted successfully")
                 mutate(`all_tracks_in_${playlistId}`)
+                mutate("all_playlists")
             } else {
                 toast.error("Failed to delete track")
             }

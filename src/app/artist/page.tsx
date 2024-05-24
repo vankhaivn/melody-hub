@@ -107,7 +107,7 @@ const TabList = ({
     return (
         <Tabs color="success" size="lg">
             {countries.map((country) => (
-                <Tab key={country} title={country}>
+                <Tab key={country} title={country} className="font-bold">
                     {filteredArtists(country).length > 0 ? (
                         AvatarList({
                             artists: filteredArtists(country),
