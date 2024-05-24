@@ -80,6 +80,9 @@ export default function DetailTrackPage({
     }
 
     const handleRemoveTrack = async () => {
+        if (!window.confirm("Are you sure to remove this track?")) {
+            return null
+        }
         try {
             setIsRemovingTrack(true)
             const response = await remove_my_created_track(params.id)
